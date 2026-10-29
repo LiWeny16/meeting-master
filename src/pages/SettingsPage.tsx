@@ -311,10 +311,10 @@ export function SettingsPage() {
       </section>
 
       <section className="panel">
-        <div className="panel-head"><div className="panel-head-copy"><h2 className="panel-title">{locale === 'zh-CN' ? '????' : 'Software updates'}</h2></div></div>
+        <div className="panel-head"><div className="panel-head-copy"><h2 className="panel-title">{locale === 'zh-CN' ? '\u8f6f\u4ef6\u66f4\u65b0' : 'Software updates'}</h2></div></div>
         <div className="panel-body settings-rows"><div className="settings-row">
-          <div className="settings-row-label"><span className="field-label">{locale === 'zh-CN' ? '????' : 'Current version'}: {updates.version}</span><p className="panel-caption" role="status">{updates.message}</p></div>
-          <div className="settings-row-control">{updates.phase === 'ready' ? <Button size="small" variant="contained" onClick={() => void updates.install()}>{locale === 'zh-CN' ? '?????' : 'Install and restart'}</Button> : <Button size="small" variant="outlined" disabled={!native || ['disabled', 'checking', 'downloading', 'installing'].includes(updates.phase)} onClick={() => void updates.checkNow()}>{locale === 'zh-CN' ? '????' : 'Check for updates'}</Button>}</div>
+          <div className="settings-row-label"><span className="field-label">{locale === 'zh-CN' ? '\u5f53\u524d\u7248\u672c' : 'Current version'}: {updates.version}</span><p className="panel-caption" role="status">{updates.message}</p></div>
+          <div className="settings-row-control">{updates.phase === 'ready' ? <Button size="small" variant="contained" onClick={() => void updates.install()}>{locale === 'zh-CN' ? '\u5b89\u88c5\u5e76\u91cd\u542f' : 'Install and restart'}</Button> : <Button size="small" variant="outlined" disabled={!native || ['disabled', 'checking', 'downloading', 'installing'].includes(updates.phase)} onClick={() => void updates.checkNow()}>{locale === 'zh-CN' ? '\u68c0\u67e5\u66f4\u65b0' : 'Check for updates'}</Button>}</div>
         </div></div>
       </section>
 

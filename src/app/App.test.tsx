@@ -60,6 +60,14 @@ describe('Meeting Master native-first shell', () => {
     expect(await screen.findByRole('heading', { name: '还没有会议' })).toBeInTheDocument();
   });
 
+  it('shows translated update controls in Chinese', async () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: '\u4e2d\u6587' }));
+    fireEvent.click(screen.getAllByRole('link', { name: '\u8bbe\u7f6e' })[0]);
+    expect(await screen.findByRole('heading', { name: '\u8f6f\u4ef6\u66f4\u65b0' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '\u68c0\u67e5\u66f4\u65b0' })).toBeInTheDocument();
+  });
+
   it('persists a palette preference', async () => {
     const { unmount } = render(<App />);
     fireEvent.click(screen.getAllByRole('link', { name: 'Settings' })[0]);

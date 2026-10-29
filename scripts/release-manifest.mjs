@@ -1,4 +1,4 @@
-﻿import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const tag = process.argv[2];
@@ -11,6 +11,8 @@ const files = await readdir(dir);
 const installer = files.find((file) => file.endsWith(`_${version}_x64-setup.exe`));
 if (!installer) throw new Error(`No NSIS installer found for ${tag}`);
 const signature = (await readFile(path.join(dir, `${installer}.sig`), 'utf8')).trim();
+// GitHub normalizes spaces in release asset names to dots.
+const assetName = installer.replaceAll(' ', '.');
 if (!signature) throw new Error('The installer signature is empty');
 const manifest = {
   version,
@@ -19,7 +21,7 @@ const manifest = {
   platforms: {
     'windows-x86_64': {
       signature,
-      url: `https://github.com/LiWeny16/meeting-master/releases/download/${tag}/${encodeURIComponent(installer)}`,
+      url: `https://github.com/LiWeny16/meeting-master/releases/download/${tag}/${encodeURIComponent(assetName)}`,
     },
   },
 };
