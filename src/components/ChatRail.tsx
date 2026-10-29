@@ -1,21 +1,19 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import {
-  AddCommentRounded,
-  AddRounded,
-  ArrowUpwardRounded,
-  AttachFileRounded,
-  CheckRounded,
-  ChatBubbleOutlineRounded,
-  ChevronRightRounded,
-  CloseRounded,
-  ContentCopyRounded,
-  DescriptionOutlined,
-  ExpandMoreRounded,
-  HelpOutlineRounded,
-  HistoryRounded,
-  StopRounded,
-  TaskAltRounded,
-} from '@mui/icons-material';
+import AddCommentRounded from '@mui/icons-material/AddCommentRounded';
+import AddRounded from '@mui/icons-material/AddRounded';
+import ArrowUpwardRounded from '@mui/icons-material/ArrowUpwardRounded';
+import AttachFileRounded from '@mui/icons-material/AttachFileRounded';
+import CheckRounded from '@mui/icons-material/CheckRounded';
+import ChatBubbleOutlineRounded from '@mui/icons-material/ChatBubbleOutlineRounded';
+import ChevronRightRounded from '@mui/icons-material/ChevronRightRounded';
+import CloseRounded from '@mui/icons-material/CloseRounded';
+import ContentCopyRounded from '@mui/icons-material/ContentCopyRounded';
+import DescriptionOutlined from '@mui/icons-material/DescriptionOutlined';
+import ExpandMoreRounded from '@mui/icons-material/ExpandMoreRounded';
+import HelpOutlineRounded from '@mui/icons-material/HelpOutlineRounded';
+import HistoryRounded from '@mui/icons-material/HistoryRounded';
+import StopRounded from '@mui/icons-material/StopRounded';
+import TaskAltRounded from '@mui/icons-material/TaskAltRounded';
 import {
   Alert,
   Box,
@@ -49,7 +47,7 @@ import type {
 } from '../domain/contracts';
 import { isTranslatedMessage, useI18n, type MessageKey } from '../i18n/strings';
 import { AGENT_SETTINGS_CHANGED_EVENT, ASSISTANT_COMPOSE_EVENT, ASSISTANT_CONTEXT_EVENT, ASSISTANT_CONTEXT_MIME, getAssistantPageContext, type AssistantComposeEventDetail, type AssistantContextDetail } from '../services/AssistantEvents';
-import { AgentActivity, AgentPermissionPart, AgentSourcePart, AgentTextPart } from './chat/AgentParts';
+import { AgentActivity, AgentPermissionPart, AgentSourcePart, AgentTextPart, AgentToolPart } from './chat/AgentParts';
 import { CONTEXT_STATUS_PART_NAME, PERMISSION_PART_NAME, useAgentRuntime } from './chat/agentRuntime';
 import { ProviderLogo } from './ProviderLogo';
 
@@ -929,7 +927,7 @@ export function ChatRail() {
                             Text: message.role === 'user' ? UserTextPart : AgentTextPart,
                             Reasoning: HIDDEN_PART,
                             Source: HIDDEN_PART,
-                            tools: { Fallback: HIDDEN_PART },
+                            tools: { Fallback: AgentToolPart },
                             data: { by_name: { [PERMISSION_PART_NAME]: AgentPermissionPart, [CONTEXT_STATUS_PART_NAME]: HIDDEN_PART } },
                           }}
                         />

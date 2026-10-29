@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowBackOutlined } from '@mui/icons-material';
+import ArrowBackOutlined from '@mui/icons-material/ArrowBackOutlined';
 import { Button } from '@mui/material';
 import { useI18n } from '../../i18n/strings';
 import type { Meeting } from '../../domain/contracts';

@@ -1,5 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { ArrowBackOutlined, MicOutlined, StopCircleOutlined } from '@mui/icons-material';
+import ArrowBackOutlined from '@mui/icons-material/ArrowBackOutlined';
+import MicOutlined from '@mui/icons-material/MicOutlined';
+import StopCircleOutlined from '@mui/icons-material/StopCircleOutlined';
 import { Alert, Button } from '@mui/material';
 import { useLocation, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import type { AsrStreamStatusEvent, Meeting, TranscriptSegment, TranscriptUpdateEvent } from '../domain/contracts';

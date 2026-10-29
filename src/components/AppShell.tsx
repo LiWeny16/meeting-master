@@ -1,10 +1,16 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import {
-  AddRounded, CalendarMonthOutlined, ChevronLeftRounded, ChevronRightRounded, DescriptionOutlined, GraphicEqOutlined, MenuRounded, PersonOutlineRounded,
-  SettingsOutlined, SpaceDashboardRounded,
-} from '@mui/icons-material';
+import AddRounded from '@mui/icons-material/AddRounded';
+import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined';
+import ChevronLeftRounded from '@mui/icons-material/ChevronLeftRounded';
+import ChevronRightRounded from '@mui/icons-material/ChevronRightRounded';
+import DescriptionOutlined from '@mui/icons-material/DescriptionOutlined';
+import GraphicEqOutlined from '@mui/icons-material/GraphicEqOutlined';
+import MenuRounded from '@mui/icons-material/MenuRounded';
+import PersonOutlineRounded from '@mui/icons-material/PersonOutlineRounded';
+import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
+import SpaceDashboardRounded from '@mui/icons-material/SpaceDashboardRounded';
 import { Avatar, Box, Button, Drawer, IconButton, Stack, Typography } from '@mui/material';
 import { useI18n } from '../i18n/strings';
 import { useThemePreferences } from '../app/ThemePreferencesContext';

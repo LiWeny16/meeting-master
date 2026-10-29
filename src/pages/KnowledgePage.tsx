@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AddOutlined, DeleteOutline, EditOutlined, FolderOpenOutlined, RefreshOutlined, SearchOutlined } from '@mui/icons-material';
+import AddOutlined from '@mui/icons-material/AddOutlined';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import EditOutlined from '@mui/icons-material/EditOutlined';
+import FolderOpenOutlined from '@mui/icons-material/FolderOpenOutlined';
+import RefreshOutlined from '@mui/icons-material/RefreshOutlined';
+import SearchOutlined from '@mui/icons-material/SearchOutlined';
 import { Alert, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from '@mui/material';
 import { useAppServices } from '../app/AppServicesContext';
 import { useConfirm } from '../components/feedback/ConfirmProvider';

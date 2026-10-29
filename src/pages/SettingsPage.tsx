@@ -1,5 +1,14 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { ChevronRightOutlined, ComputerOutlined, DarkModeOutlined, GraphicEqOutlined, LightModeOutlined, LockOutlined, MicOutlined, RestartAltOutlined, SpeakerOutlined, StopCircleOutlined } from '@mui/icons-material';
+import ChevronRightOutlined from '@mui/icons-material/ChevronRightOutlined';
+import ComputerOutlined from '@mui/icons-material/ComputerOutlined';
+import DarkModeOutlined from '@mui/icons-material/DarkModeOutlined';
+import GraphicEqOutlined from '@mui/icons-material/GraphicEqOutlined';
+import LightModeOutlined from '@mui/icons-material/LightModeOutlined';
+import LockOutlined from '@mui/icons-material/LockOutlined';
+import MicOutlined from '@mui/icons-material/MicOutlined';
+import RestartAltOutlined from '@mui/icons-material/RestartAltOutlined';
+import SpeakerOutlined from '@mui/icons-material/SpeakerOutlined';
+import StopCircleOutlined from '@mui/icons-material/StopCircleOutlined';
 import { Alert, Button, MenuItem, Select } from '@mui/material';
 import { AgentProviderSettings } from '../components/settings/AgentProviderSettings';
 import { useUpdates } from '../app/UpdateContext';

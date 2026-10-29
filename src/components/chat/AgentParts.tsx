@@ -1,10 +1,12 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useAuiState } from '@assistant-ui/react';
 import { Box, Button, Chip, Collapse, Stack, Typography } from '@mui/material';
-import {
-  CheckCircleRounded, ErrorOutlineRounded, ExpandMoreRounded, HandymanOutlined,
-  HourglassEmptyRounded, ShieldOutlined,
-} from '@mui/icons-material';
+import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
+import ErrorOutlineRounded from '@mui/icons-material/ErrorOutlineRounded';
+import ExpandMoreRounded from '@mui/icons-material/ExpandMoreRounded';
+import HandymanOutlined from '@mui/icons-material/HandymanOutlined';
+import HourglassEmptyRounded from '@mui/icons-material/HourglassEmptyRounded';
+import ShieldOutlined from '@mui/icons-material/ShieldOutlined';
 import type {
   DataMessagePartProps,
   ReasoningMessagePartProps,
@@ -28,6 +30,9 @@ const TOOL_LABELS: Record<string, MessageKey> = {
   search_transcript: 'toolNameSearchTranscript',
   save_meeting_summary: 'toolNameSaveMeetingSummary',
   save_meeting_actions: 'toolNameSaveMeetingActions',
+  list_mcp_sources: 'toolNameListMcpSources',
+  inspect_mcp_tools: 'toolNameInspectMcpTools',
+  call_mcp_tool: 'toolNameCallMcpTool',
 };
 
 function preview(value: unknown): string {
@@ -289,7 +294,7 @@ export function AgentPermissionPart({ data }: DataMessagePartProps<PermissionReq
         <Typography className="chat-permission-tool">{toolLabel}</Typography>
       ) : null}
       {preview(request.input) ? (
-        <details className="chat-permission-details">
+        <details className="chat-permission-details" open={request.tool === 'call_mcp_tool' ? true : undefined}>
           <summary>{t('toolDetails')}</summary>
           <pre className="chat-tool-json">{preview(request.input)}</pre>
         </details>

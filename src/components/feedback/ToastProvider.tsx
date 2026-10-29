@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Alert, Button, IconButton, Snackbar } from '@mui/material';
-import { CloseRounded } from '@mui/icons-material';
+import CloseRounded from '@mui/icons-material/CloseRounded';
 import { useI18n } from '../../i18n/strings';
 
 export type ToastTone = 'success' | 'error' | 'info';

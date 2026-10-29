@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  AddOutlined, ArrowForwardOutlined, CalendarTodayOutlined, ChevronRightOutlined,
-  ClearOutlined, GraphicEqOutlined, MicOutlined, ScheduleOutlined, SearchOutlined,
-} from '@mui/icons-material';
+import AddOutlined from '@mui/icons-material/AddOutlined';
+import ArrowForwardOutlined from '@mui/icons-material/ArrowForwardOutlined';
+import CalendarTodayOutlined from '@mui/icons-material/CalendarTodayOutlined';
+import ChevronRightOutlined from '@mui/icons-material/ChevronRightOutlined';
+import ClearOutlined from '@mui/icons-material/ClearOutlined';
+import GraphicEqOutlined from '@mui/icons-material/GraphicEqOutlined';
+import MicOutlined from '@mui/icons-material/MicOutlined';
+import ScheduleOutlined from '@mui/icons-material/ScheduleOutlined';
+import SearchOutlined from '@mui/icons-material/SearchOutlined';
 import { Alert, Button, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import type { Meeting } from '../domain/contracts';

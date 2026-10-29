@@ -1,8 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import {
-  ArrowBackIosNewRounded, ChevronRightRounded, CloseRounded, CropSquareRounded,
-  FilterNoneRounded, RemoveRounded, SpaceDashboardRounded,
-} from '@mui/icons-material';
+import ArrowBackIosNewRounded from '@mui/icons-material/ArrowBackIosNewRounded';
+import ChevronRightRounded from '@mui/icons-material/ChevronRightRounded';
+import CloseRounded from '@mui/icons-material/CloseRounded';
+import CropSquareRounded from '@mui/icons-material/CropSquareRounded';
+import FilterNoneRounded from '@mui/icons-material/FilterNoneRounded';
+import RemoveRounded from '@mui/icons-material/RemoveRounded';
+import SpaceDashboardRounded from '@mui/icons-material/SpaceDashboardRounded';
 import { Box, Typography } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import type { UnlistenFn } from '@tauri-apps/api/event';

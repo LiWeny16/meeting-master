@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import { AddOutlined, DeleteOutline, EditOutlined, GroupsOutlined } from '@mui/icons-material';
+import AddOutlined from '@mui/icons-material/AddOutlined';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+import EditOutlined from '@mui/icons-material/EditOutlined';
+import GroupsOutlined from '@mui/icons-material/GroupsOutlined';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import type { MeetingIdentity } from '../domain/contracts';
 import { useAppServices } from '../app/AppServicesContext';

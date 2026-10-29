@@ -10,6 +10,7 @@ use crate::agent::types::{
     AgentConversation, AgentConversationList, AgentHistoryEntry, AgentProviderInfo, AgentSettings,
     AgentStatus, ProviderModelInput, ProviderTestResult,
 };
+use crate::knowledge::KnowledgeState;
 use crate::meetings::MeetingsState;
 
 #[tauri::command]
@@ -121,6 +122,7 @@ pub fn agent_conversation_select(
 pub async fn agent_send(
     state: State<'_, Arc<AgentState>>,
     meetings: State<'_, MeetingsState>,
+    knowledge: State<'_, KnowledgeState>,
     text: String,
     context: Option<ContextInput>,
     conversation_id: Option<String>,
@@ -138,6 +140,7 @@ pub async fn agent_send(
             conversation_id,
             attachments,
             meetings.inner(),
+            knowledge.inner(),
         )
         .await
 }

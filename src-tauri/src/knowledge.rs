@@ -16,7 +16,7 @@ use tauri_plugin_dialog::DialogExt;
 
 use crate::asr::crypto;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct StoredSource {
     id: String,
@@ -34,6 +34,21 @@ pub struct KnowledgeSource {
     kind: String,
     base_url: String,
     has_api_key: bool,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct AgentMcpSource {
+    id: String,
+    name: String,
+}
+
+pub(crate) struct AgentMcpTarget(StoredSource);
+
+impl AgentMcpTarget {
+    pub(crate) fn label(&self) -> String {
+        format!("{} ({})", self.0.name, self.0.base_url)
+    }
 }
 
 impl From<&StoredSource> for KnowledgeSource {
@@ -273,6 +288,48 @@ impl KnowledgeState {
             .find(|source| source.id == id)
             .cloned()
             .ok_or_else(|| "Knowledge source not found".to_string())
+    }
+
+    pub(crate) fn agent_mcp_sources(&self) -> Result<Vec<AgentMcpSource>, String> {
+        self.ensure_loaded()?;
+        let sources = self
+            .sources
+            .lock()
+            .map_err(|_| "Knowledge settings are unavailable".to_string())?;
+        Ok(sources
+            .iter()
+            .filter(|source| source.kind == "mcp")
+            .map(|source| AgentMcpSource {
+                id: source.id.clone(),
+                name: source.name.clone(),
+            })
+            .collect())
+    }
+
+    pub(crate) async fn agent_mcp_inspect(&self, source_id: &str) -> Result<Value, String> {
+        let source = self.source(source_id)?;
+        let catalog = inspect_mcp(self, &source).await?;
+        serde_json::to_value(catalog).map_err(|_| "Could not read MCP capabilities".into())
+    }
+
+    pub(crate) async fn agent_mcp_call(
+        &self,
+        target: AgentMcpTarget,
+        name: String,
+        args: Value,
+    ) -> Result<Value, String> {
+        if self.source(&target.0.id)? != target.0 {
+            return Err("The MCP connection changed after approval. Review the new connection and try again.".into());
+        }
+        call_mcp(self, &target.0, name, args).await
+    }
+
+    pub(crate) fn agent_mcp_target(&self, source_id: &str) -> Result<AgentMcpTarget, String> {
+        let source = self.source(source_id)?;
+        if source.kind != "mcp" {
+            return Err("This source is not an MCP service".into());
+        }
+        Ok(AgentMcpTarget(source))
     }
 }
 
@@ -1195,6 +1252,40 @@ mod tests {
                 state.source(&source.id).unwrap().base_url,
                 "http://127.0.0.1:9380"
             );
+        }
+
+        #[tokio::test]
+        async fn rejects_a_tool_call_when_connection_changed_after_review() {
+            let temp = tempfile::tempdir().unwrap();
+            let state = KnowledgeState::from_path(temp.path().join("sources.json")).unwrap();
+            let source = save_source(
+                &state,
+                KnowledgeSourceInput {
+                    id: None,
+                    name: "MCP".into(),
+                    kind: "mcp".into(),
+                    base_url: "http://127.0.0.1:9382/mcp".into(),
+                    api_key: None,
+                },
+            )
+            .unwrap();
+            let target = state.agent_mcp_target(&source.id).unwrap();
+            save_source(
+                &state,
+                KnowledgeSourceInput {
+                    id: Some(source.id),
+                    name: "MCP".into(),
+                    kind: "mcp".into(),
+                    base_url: "http://127.0.0.1:9383/mcp".into(),
+                    api_key: None,
+                },
+            )
+            .unwrap();
+            let error = state
+                .agent_mcp_call(target, "search".into(), json!({}))
+                .await
+                .unwrap_err();
+            assert!(error.contains("changed after approval"));
         }
 
         async fn fixture(

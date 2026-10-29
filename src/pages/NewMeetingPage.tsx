@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import { ArrowBackOutlined, ArrowForwardOutlined, PlayArrowOutlined, ShieldOutlined } from '@mui/icons-material';
+import ArrowBackOutlined from '@mui/icons-material/ArrowBackOutlined';
+import ArrowForwardOutlined from '@mui/icons-material/ArrowForwardOutlined';
+import PlayArrowOutlined from '@mui/icons-material/PlayArrowOutlined';
+import ShieldOutlined from '@mui/icons-material/ShieldOutlined';
 import { Alert, Button, MenuItem, TextField } from '@mui/material';
 import type { MeetingIdentity } from '../domain/contracts';
 import { useNavigate } from 'react-router-dom';

@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { AddOutlined, BoltOutlined, LockOutlined, MoreHorizOutlined, RefreshOutlined } from '@mui/icons-material';
+import AddOutlined from '@mui/icons-material/AddOutlined';
+import BoltOutlined from '@mui/icons-material/BoltOutlined';
+import LockOutlined from '@mui/icons-material/LockOutlined';
+import MoreHorizOutlined from '@mui/icons-material/MoreHorizOutlined';
+import RefreshOutlined from '@mui/icons-material/RefreshOutlined';
 import {
   Alert,
   Button,

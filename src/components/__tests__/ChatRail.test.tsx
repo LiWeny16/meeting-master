@@ -150,7 +150,7 @@ describe('Meeting Master assistant rail', () => {
     expect(screen.getByText('Friday').tagName).toBe('STRONG');
   });
 
-  it('summarizes completed work without exposing tool names or arguments', async () => {
+  it('shows a completed tool card and reveals its details on demand', async () => {
     const send = vi.fn(async (_request: { text: string }, onEvent: (event: AgentEvent) => void) => {
       onEvent({ type: 'tool_call_start', callId: 'call-1', name: 'page_state', input: { url: '/meetings' } });
       onEvent({ type: 'tool_call_end', callId: 'call-1', output: { title: 'Meetings' } });
@@ -162,8 +162,10 @@ describe('Meeting Master assistant rail', () => {
     await ask('what page am I on?');
 
     await waitFor(() => expect(screen.getByText('Checked the page.')).toBeInTheDocument());
-    expect(screen.queryByText('page state')).not.toBeInTheDocument();
-    expect(document.querySelector('.chat-tool-card')).not.toBeInTheDocument();
+    expect(screen.getByText('page state')).toBeInTheDocument();
+    expect(document.querySelector('.chat-tool-card')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /page state/ }));
+    expect(screen.getByText(/\/meetings/)).toBeInTheDocument();
     expect(screen.getByText(/Completed/)).toBeInTheDocument();
   });
 
@@ -186,6 +188,24 @@ describe('Meeting Master assistant rail', () => {
     expect(screen.queryByText('Allowed')).not.toBeInTheDocument();
   });
 
+  it('shows the full MCP target and arguments before allowing a decision', async () => {
+    let complete!: () => void;
+    const approve = vi.fn(async () => { complete(); });
+    const send = vi.fn(async (_request: AgentRequest, onEvent: (event: AgentEvent) => void) => {
+      onEvent({ type: 'permission_request', requestId: 'mcp-1', tool: 'call_mcp_tool', input: '{"source":"My MCP (http://127.0.0.1:9382/mcp)","tool":"search","arguments":{"query":"budget"}}' });
+      await new Promise<void>((resolve) => { complete = resolve; });
+    });
+    render(<App services={withAgent({ send, approve })} />);
+    await ask('Search my documents');
+    expect(await screen.findByText('Run MCP tool')).toBeInTheDocument();
+    const detail = document.querySelector<HTMLDetailsElement>('.chat-permission-details');
+    expect(detail).toHaveAttribute('open');
+    expect(detail).toHaveTextContent('http://127.0.0.1:9382/mcp');
+    expect(detail).toHaveTextContent('budget');
+    fireEvent.click(screen.getByRole('button', { name: 'Deny' }));
+    await waitFor(() => expect(approve).toHaveBeenCalledWith('mcp-1', 'deny'));
+  });
+
   it('shows live reasoning and collapses it into a compact completed row', async () => {
     let complete!: () => void;
     const send = vi.fn(async (_request: { text: string }, onEvent: (event: AgentEvent) => void) => {
@@ -202,8 +222,8 @@ describe('Meeting Master assistant rail', () => {
 
     expect(await screen.findByText('checking the transcript')).toBeInTheDocument();
     expect(document.querySelector('.chat-activity-flow')).toBeInTheDocument();
-    expect(document.querySelector('.chat-tool-card')).not.toBeInTheDocument();
-    expect(screen.queryByText('search transcript')).not.toBeInTheDocument();
+    expect(document.querySelector('.chat-tool-card')).toBeInTheDocument();
+    expect(screen.getByText('Search transcript')).toBeInTheDocument();
     complete();
     const toggle = await screen.findByRole('button', { name: /Completed/ });
     expect(screen.queryByText('checking the transcript')).not.toBeInTheDocument();

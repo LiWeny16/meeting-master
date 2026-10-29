@@ -1,14 +1,12 @@
 import { forgetMeetingView, readMeetingView, writeMeetingView } from '../app/meetingViewCache';
 import { useEffect, useState } from 'react';
-import {
-  ArrowBackOutlined,
-  CheckCircleOutlineOutlined,
-  ChevronRightOutlined,
-  ClearOutlined,
-  DescriptionOutlined,
-  RadioButtonUncheckedOutlined,
-  SummarizeOutlined,
-} from '@mui/icons-material';
+import ArrowBackOutlined from '@mui/icons-material/ArrowBackOutlined';
+import CheckCircleOutlineOutlined from '@mui/icons-material/CheckCircleOutlineOutlined';
+import ChevronRightOutlined from '@mui/icons-material/ChevronRightOutlined';
+import ClearOutlined from '@mui/icons-material/ClearOutlined';
+import DescriptionOutlined from '@mui/icons-material/DescriptionOutlined';
+import RadioButtonUncheckedOutlined from '@mui/icons-material/RadioButtonUncheckedOutlined';
+import SummarizeOutlined from '@mui/icons-material/SummarizeOutlined';
 import { Alert, Button, CircularProgress } from '@mui/material';
 import { NavLink, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import type { Meeting, TranscriptSegment } from '../domain/contracts';

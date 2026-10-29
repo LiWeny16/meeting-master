@@ -26,6 +26,7 @@ use crate::agent::types::{
 };
 use crate::asr::crypto;
 use crate::audio::types::ASR_SAMPLE_RATE;
+use crate::knowledge::KnowledgeState;
 use crate::meetings::{MeetingAction, MeetingsState, TranscriptPage, TranscriptSegment};
 
 const LOCAL_PROVIDER_ID: &str = "onion-3080";
@@ -85,6 +86,15 @@ impl ToolBudget {
 
 fn idle_deadline(now: TokioInstant, hard_deadline: TokioInstant) -> TokioInstant {
     (now + TURN_IDLE_TIMEOUT).min(hard_deadline)
+}
+
+fn bounded_mcp_output(value: Value, limit: usize) -> Value {
+    let text = value.to_string();
+    if text.chars().count() <= limit {
+        value
+    } else {
+        json!({"truncated": true, "preview": text.chars().take(limit).collect::<String>(), "message": "The MCP result was truncated to fit the model context."})
+    }
 }
 
 fn turn_timeout_message(now: TokioInstant, hard_deadline: TokioInstant) -> &'static str {
@@ -616,6 +626,7 @@ impl AgentState {
         conversation_id: Option<String>,
         attachments: Vec<context::AgentAttachment>,
         meetings: &MeetingsState,
+        knowledge: &KnowledgeState,
     ) -> Result<(), String> {
         let _turn_guard = self.turn.lock().await;
         let meeting_id = context.as_ref().and_then(|ctx| ctx.meeting_id.clone());
@@ -796,6 +807,7 @@ impl AgentState {
             "text": prompt,
             "displayText": display_text,
             "attachments": attachments,
+            "mcpEnabled": knowledge.agent_mcp_sources().map(|sources| !sources.is_empty()).unwrap_or(false),
             "history": stored_conversation.messages_for_context(meeting_id.as_deref()),
             "visibleHistory": stored_conversation.visible_history,
         });
@@ -851,6 +863,7 @@ impl AgentState {
                                         &selected_id,
                                         &request_id,
                                         meetings,
+                                        knowledge,
                                         &mut stdin,
                                         &mut control_rx,
                                         &mut interrupted,
@@ -1193,6 +1206,7 @@ impl AgentState {
         conversation_id: &str,
         request_id: &str,
         meetings: &MeetingsState,
+        knowledge: &KnowledgeState,
         stdin: &mut ChildStdin,
         controls: &mut mpsc::UnboundedReceiver<TurnControl>,
         interrupted: &mut bool,
@@ -1256,6 +1270,7 @@ impl AgentState {
                     meeting_id,
                     request_id,
                     meetings,
+                    knowledge,
                     stdin,
                     controls,
                     interrupted,
@@ -1290,6 +1305,7 @@ impl AgentState {
         expected_meeting_id: Option<&str>,
         turn_id: &str,
         meetings: &MeetingsState,
+        knowledge: &KnowledgeState,
         stdin: &mut ChildStdin,
         controls: &mut mpsc::UnboundedReceiver<TurnControl>,
         interrupted: &mut bool,
@@ -1317,6 +1333,122 @@ impl AgentState {
             )
             .await;
         }
+        let args = record.get("args").cloned().unwrap_or_else(|| json!({}));
+        if matches!(
+            name,
+            "list_mcp_sources" | "inspect_mcp_tools" | "call_mcp_tool"
+        ) {
+            if name == "list_mcp_sources" {
+                let result = knowledge.agent_mcp_sources().and_then(|sources| {
+                    serde_json::to_value(sources).map_err(|error| error.to_string())
+                });
+                return match result {
+                    Ok(value) => {
+                        write_tool_result(
+                            stdin,
+                            call_id,
+                            bounded_mcp_output(value, tool_budget.text_chars * 8),
+                            None,
+                        )
+                        .await
+                    }
+                    Err(error) => write_tool_result(stdin, call_id, Value::Null, Some(error)).await,
+                };
+            }
+            let source_id = args
+                .get("sourceId")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
+            let target = match knowledge.agent_mcp_target(source_id) {
+                Ok(target) => target,
+                Err(error) => {
+                    return write_tool_result(stdin, call_id, Value::Null, Some(error)).await;
+                }
+            };
+            let tool_name = args
+                .get("toolName")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_string();
+            let arguments = args.get("arguments").cloned().unwrap_or_else(|| json!({}));
+            if name == "call_mcp_tool" {
+                if tool_name.trim().is_empty()
+                    || !arguments.is_object()
+                    || arguments.to_string().chars().count() > 2500
+                {
+                    return write_tool_result(stdin, call_id, Value::Null, Some("MCP tool name and a JSON argument object of at most 2500 characters are required.".into())).await;
+                }
+                let preview = serde_json::to_string_pretty(
+                    &json!({"source": target.label(), "tool": tool_name, "arguments": arguments}),
+                )
+                .unwrap_or_default();
+                if preview.encode_utf16().count() > 3800 {
+                    return write_tool_result(
+                        stdin,
+                        call_id,
+                        Value::Null,
+                        Some("MCP arguments are too large to review safely.".into()),
+                    )
+                    .await;
+                }
+                let request_id = format!("agent:{turn_id}:{call_id}");
+                let (sender, receiver) = oneshot::channel();
+                lock(&self.approvals, "permission requests")
+                    .insert(request_id.clone(), (turn_id.to_string(), sender));
+                self.emit(AgentEvent::PermissionRequest {
+                    request_id: request_id.clone(),
+                    tool: "call_mcp_tool".into(),
+                    input: Some(preview),
+                    title: Some("Run MCP tool".into()),
+                    meeting_id: meeting_id.map(str::to_string),
+                });
+                let approval_deadline = (TokioInstant::now() + APPROVAL_TIMEOUT).min(hard_deadline);
+                let allow = tokio::select! {
+                    result = tokio::time::timeout_at(approval_deadline, receiver) => result.ok().and_then(Result::ok).unwrap_or(false),
+                    control = controls.recv(), if !*interrupted => {
+                        if matches!(control, Some(TurnControl::Abort)) { *interrupted = true; reject_turn_approvals(&self.approvals, turn_id); let _ = write_json_line(stdin, &json!({"type":"abort"})).await; }
+                        false
+                    }
+                };
+                lock(&self.approvals, "permission requests").remove(&request_id);
+                if !allow {
+                    return write_tool_result(
+                        stdin,
+                        call_id,
+                        Value::Null,
+                        Some("The user did not approve this MCP tool call.".into()),
+                    )
+                    .await;
+                }
+            }
+            let operation = async {
+                if name == "inspect_mcp_tools" {
+                    knowledge.agent_mcp_inspect(source_id).await
+                } else {
+                    knowledge.agent_mcp_call(target, tool_name, arguments).await
+                }
+            };
+            let result = tokio::select! {
+                result = operation => result,
+                control = controls.recv(), if !*interrupted => {
+                    if matches!(control, Some(TurnControl::Abort)) { *interrupted = true; reject_turn_approvals(&self.approvals, turn_id); let _ = write_json_line(stdin, &json!({"type":"abort"})).await; }
+                    Err("The MCP operation was interrupted.".to_string())
+                },
+                _ = tokio::time::sleep_until(hard_deadline) => Err("The MCP operation exceeded the turn time limit.".to_string()),
+            };
+            return match result {
+                Ok(value) => {
+                    write_tool_result(
+                        stdin,
+                        call_id,
+                        bounded_mcp_output(value, tool_budget.text_chars * 8),
+                        None,
+                    )
+                    .await
+                }
+                Err(error) => write_tool_result(stdin, call_id, Value::Null, Some(error)).await,
+            };
+        }
         let Some(meeting_id) = meeting_id else {
             return write_tool_result(
                 stdin,
@@ -1326,8 +1458,6 @@ impl AgentState {
             )
             .await;
         };
-        let args = record.get("args").cloned().unwrap_or_else(|| json!({}));
-
         if matches!(name, "save_meeting_summary" | "save_meeting_actions") {
             let request_id = format!("agent:{turn_id}:{call_id}");
             let preview = match name {

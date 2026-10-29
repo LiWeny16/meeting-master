@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { StopRounded } from '@mui/icons-material';
+import StopRounded from '@mui/icons-material/StopRounded';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppServices } from '../app/AppServicesContext';
 import { useI18n } from '../i18n/strings';

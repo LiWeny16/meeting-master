@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 const runtimeDir = resolve(dirname(fileURLToPath(import.meta.url)), '../agent-runtime');
 
-async function runHost({ effort, providerId = 'deepseek', toolRound = false, history = [], visibleHistory = [], meetingId = 'mock', attachments = [] }) {
+async function runHost({ effort, providerId = 'deepseek', toolRound = false, history = [], visibleHistory = [], meetingId = 'mock', attachments = [], mcpEnabled = false, toolName = 'get_meeting_context' }) {
   const requests = [];
   const events = [];
   let error = '';
@@ -25,7 +25,7 @@ async function runHost({ effort, providerId = 'deepseek', toolRound = false, his
     })}\n\n`);
     if (toolRound && requests.length === 1) {
       send({ role: 'assistant', reasoning_content: 'mock reasoning' });
-      send({ tool_calls: [{ index: 0, id: 'call_1', type: 'function', function: { name: 'get_meeting_context', arguments: '{}' } }] });
+      send({ tool_calls: [{ index: 0, id: 'call_1', type: 'function', function: { name: toolName, arguments: toolName === 'inspect_mcp_tools' ? '{"sourceId":"source-1"}' : '{}' } }] });
       send({}, 'tool_calls');
       res.end('data: [DONE]\n\n');
       return;
@@ -69,7 +69,7 @@ async function runHost({ effort, providerId = 'deepseek', toolRound = false, his
       apiKey: 'fake', noAuth: false, thinkingEffort: effort,
       model: { id: 'deepseek-flash', name: 'Mock', contextWindow: 1_000_000, maxTokens: 4096 },
     },
-    text: 'Summarize the meeting.', displayText: 'Summarize the meeting.', history, visibleHistory, attachments,
+    text: 'Summarize the meeting.', displayText: 'Summarize the meeting.', history, visibleHistory, attachments, mcpEnabled,
   });
   const [code] = await once(child, 'close');
   clearTimeout(timer);
@@ -118,6 +118,16 @@ test('Other OpenAI-compatible providers keep their existing request fields', { t
 test('General chat does not send unavailable meeting tools', { timeout: 20_000 }, async () => {
   const { requests } = await runHost({ effort: 'off', meetingId: null });
   assert.ok(!requests[0].tools || requests[0].tools.length === 0);
+});
+
+test('configured MCP services expose tools to the agent in general chat', { timeout: 20_000 }, async () => {
+  const { requests, events } = await runHost({ effort: 'off', meetingId: null, mcpEnabled: true, toolRound: true, toolName: 'inspect_mcp_tools' });
+  const names = requests[0].tools.map((tool) => tool.function.name);
+  assert.ok(names.includes('list_mcp_sources'));
+  assert.ok(names.includes('inspect_mcp_tools'));
+  assert.ok(names.includes('call_mcp_tool'));
+  assert.ok(events.some((event) => event.type === 'tool_call_start' && event.name === 'inspect_mcp_tools'));
+  assert.ok(requests[1].messages.some((message) => message.role === 'tool'));
 });
 
 test('sends text files and images to a compatible model', { timeout: 20_000 }, async () => {

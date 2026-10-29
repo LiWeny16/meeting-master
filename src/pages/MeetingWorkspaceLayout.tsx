@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowBackOutlined } from '@mui/icons-material';
+import ArrowBackOutlined from '@mui/icons-material/ArrowBackOutlined';
 import { Button } from '@mui/material';
 import { useAppServices } from '../app/AppServicesContext';
 import { useI18n } from '../i18n/strings';

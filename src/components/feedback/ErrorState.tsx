@@ -1,5 +1,5 @@
 import { Button } from '@mui/material';
-import { RefreshRounded } from '@mui/icons-material';
+import RefreshRounded from '@mui/icons-material/RefreshRounded';
 import { useI18n } from '../../i18n/strings';
 
 /**
