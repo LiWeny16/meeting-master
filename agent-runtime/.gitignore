@@ -1,0 +1,5 @@
+node_modules/
+runtime/node.exe
+runtime/node.exe.download
+.dependencies.sha256
+.node-package-staging/

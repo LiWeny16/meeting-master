@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-labelledby="new-meeting-title new-meeting-desc" shape-rendering="geometricPrecision">
+  <title id="new-meeting-title">Meeting Master — new meeting preparation</title>
+  <desc id="new-meeting-desc">A preparation screen with independent source selection, granular provider-purpose consent, and honest credentials versus ProtocolUnavailable readiness.</desc>
+  <style>
+    text { font-family: 'Microsoft YaHei UI', 'Segoe UI Variable', 'Segoe UI', 'Noto Sans CJK SC', sans-serif; }
+    .primary { fill: #132230; }
+    .body { fill: #263944; }
+    .secondary { fill: #50616C; }
+    .teal { fill: #087F79; }
+    .blue { fill: #194FAF; }
+    .warning { fill: #875500; }
+    .error { fill: #A52D3B; }
+    .note { font-size: 12px; }
+    .label { font-size: 11px; }
+    .status { font-size: 13px; font-weight: 700; }
+  </style>
+
+  <rect width="1440" height="900" fill="#F4F7F8"/>
+  <rect width="1440" height="64" fill="#F9FBFC"/>
+  <path d="M0 63.5H1440" stroke="#D4DEE3"/>
+
+  <rect x="20" y="15" width="34" height="34" rx="10" fill="#173248"/>
+  <path d="M29 40V25l8 9 8-9v15" fill="none" stroke="#F7FAFB" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="26" cy="40" r="2.2" fill="#63D6C5"/><circle cx="48" cy="40" r="2.2" fill="#8CA7FF"/>
+  <text x="68" y="36" class="primary" font-size="15" font-weight="700">Meeting Master</text>
+  <text x="68" y="51" class="secondary label">会议准备</text>
+  <text x="1100" y="37" class="secondary note">不会在此页开始采集</text>
+  <rect x="1280" y="12" width="140" height="40" rx="10" fill="#FFFFFF" stroke="#D4DEE3"/>
+  <path d="M1318 22l-9 10 9 10M1310 32h18" fill="none" stroke="#2D6CDF" stroke-width="1.8" stroke-linecap="round"/>
+  <text x="1340" y="37" class="body status">返回会话库</text>
+
+  <rect y="64" width="204" height="836" fill="#ECF2F4"/>
+  <path d="M203.5 64V900" stroke="#D4DEE3"/>
+  <text x="20" y="98" class="secondary status">工作区</text>
+  <path d="M29 128v17M20.5 136.5h17" stroke="#50616C" stroke-width="1.8" stroke-linecap="round"/><text x="56" y="141" class="body note">会话库</text>
+  <rect x="12" y="160" width="180" height="42" rx="9" fill="#DCE8ED"/><rect x="12" y="160" width="3" height="42" rx="1.5" fill="#2D6CDF"/>
+  <path d="M29 176v17M20.5 184.5h17" stroke="#2D6CDF" stroke-width="1.8" stroke-linecap="round"/><text x="56" y="189" class="primary" font-size="13" font-weight="700">新建会议</text>
+  <path d="M26 228h20M26 234h14M24 222h24v18H24Z" fill="none" stroke="#50616C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><text x="56" y="237" class="body note">设置</text>
+  <path d="M20 278H184" stroke="#D2DDE2"/>
+  <text x="20" y="312" class="secondary status">开始前</text>
+  <circle cx="26" cy="340" r="5" fill="#087F79"/><text x="40" y="344" class="body note" font-weight="600">本机会话</text><text x="40" y="364" class="secondary label">原始音频默认不保存</text>
+  <text x="20" y="850" class="secondary label">Windows 桌面版 · 概念稿</text>
+
+  <g transform="translate(232 88)">
+    <text x="0" y="30" class="primary" font-size="27" font-weight="700" letter-spacing="-.02em">新建会议</text>
+    <text x="0" y="58" class="secondary note">先确认来源、语言和同意范围，再开始采集；不会把 provider 状态伪装成就绪。</text>
+    <text x="716" y="25" class="secondary label">准备流程</text>
+    <circle cx="782" cy="21" r="10" fill="#2D6CDF"/><text x="779" y="25" fill="#FFFFFF" class="label" font-weight="700">1</text><path d="M798 21h38" stroke="#B8CDEA" stroke-width="2"/>
+    <circle cx="852" cy="21" r="10" fill="#E3EBEE"/><text x="849" y="25" class="secondary label" font-weight="700">2</text><path d="M868 21h38" stroke="#E3EBEE" stroke-width="2"/>
+    <circle cx="922" cy="21" r="10" fill="#E3EBEE"/><text x="919" y="25" class="secondary label" font-weight="700">3</text>
+  </g>
+
+  <g transform="translate(232 174)">
+    <text x="0" y="24" class="primary" font-size="16" font-weight="700">会议基本信息</text>
+    <text x="0" y="50" class="secondary label">标题可选；留空时使用开始时间生成默认标题。</text>
+    <rect x="0" y="68" width="840" height="50" rx="9" fill="#FFFFFF" stroke="#D4DEE3"/>
+    <text x="18" y="99" class="body note">Q3 产品评审</text><text x="790" y="99" class="secondary label">12 / 80</text>
+    <path d="M0 150H840" stroke="#D4DEE3"/>
+    <text x="0" y="186" class="primary" font-size="16" font-weight="700">音频来源</text>
+    <text x="0" y="211" class="secondary label">两路独立采集，保留来源标签；系统输出是 WASAPI loopback，不是耳机声学回采。</text>
+
+    <g transform="translate(0 232)">
+      <rect width="408" height="116" rx="10" fill="#FFFFFF" stroke="#B7DAD6"/>
+      <circle cx="28" cy="28" r="14" fill="#E4F2F0"/><path d="M20 25h7l7-6v18l-7-6h-7Z" fill="none" stroke="#087F79" stroke-width="1.7" stroke-linejoin="round"/>
+      <text x="54" y="26" class="primary status">系统输出</text><circle cx="370" cy="22" r="5" fill="#087F79"/>
+      <text x="54" y="57" class="body note" font-weight="600">会议室扬声器</text><text x="54" y="80" class="secondary label">默认设备 · 48 kHz · loopback 可用</text>
+      <text x="54" y="103" class="teal label">☑ 使用此来源 · □ 仅此来源</text>
+    </g>
+    <g transform="translate(432 232)">
+      <rect width="408" height="116" rx="10" fill="#FFF8F7" stroke="#DFA4AB"/>
+      <circle cx="28" cy="28" r="14" fill="#FBE6E8"/><rect x="23" y="17" width="10" height="18" rx="5" fill="none" stroke="#B93845" stroke-width="1.7"/>
+      <text x="54" y="26" class="primary status">麦克风</text><circle cx="370" cy="22" r="5" fill="#B93845"/>
+      <text x="54" y="57" class="body note" font-weight="600">USB Microphone</text><text x="54" y="80" class="error status">Windows 麦克风权限待确认</text>
+      <text x="54" y="103" class="error status">□ 使用此来源 · □ 仅此来源</text>
+    </g>
+    <text x="0" y="374" class="error status">开始按钮保持禁用，直到权限检查通过；可显式只使用一个已用来源。</text>
+    <path d="M0 406H840" stroke="#D4DEE3"/>
+    <text x="0" y="442" class="primary" font-size="16" font-weight="700">语言与显示</text>
+    <text x="0" y="474" class="secondary label">原文语言</text><rect x="0" y="486" width="230" height="44" rx="9" fill="#FFFFFF" stroke="#D4DEE3"/><text x="16" y="514" class="body note">自动检测</text><path d="m202 505 5 5 5-5" fill="none" stroke="#50616C" stroke-width="1.5" stroke-linecap="round"/>
+    <text x="254" y="474" class="secondary label">译文语言</text><rect x="254" y="486" width="230" height="44" rx="9" fill="#FFFFFF" stroke="#D4DEE3"/><text x="270" y="514" class="body note">English</text><path d="m456 505 5 5 5-5" fill="none" stroke="#50616C" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="508" y="486" width="332" height="44" rx="9" fill="#E4F2F0"/><circle cx="532" cy="508" r="9" fill="#087F79"/><path d="m528 508 3 3 6-7" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/><text x="552" y="513" class="teal note" font-weight="700">显示双语转写</text>
+    <text x="0" y="570" class="secondary label">译文、摘要与 Q&amp;A 的可用性跟随各自 provider 状态，不阻塞原文显示。</text>
+    <path d="M0 604H840" stroke="#D4DEE3"/>
+    <text x="0" y="632" class="primary" font-size="16" font-weight="700">隐私同意（每项可独立撤回）</text>
+    <text x="0" y="660" class="body note">□ iFlytek · ASR：音频会离开本机并发送给已配置 provider</text>
+    <text x="430" y="660" class="body note">□ MiMo · translation：转写文本会发送</text>
+    <text x="0" y="692" class="body note">□ MiMo · summary：转写文本会发送</text>
+    <text x="430" y="692" class="body note">□ MiMo · qa：问题与必要引用会发送</text>
+    <text x="0" y="728" class="secondary label">原始音频默认不保存；未勾选的用途不会发送后续数据，已完成的 provider 处理不被撤回。</text>
+    <text x="0" y="752" class="secondary label">同意记录保存 provider × purpose、时间、policy version 和撤回时间。</text>
+  </g>
+
+  <g transform="translate(1096 174)">
+    <rect width="324" height="612" rx="14" fill="#FFFFFF" stroke="#D1DDE2"/>
+    <text x="20" y="35" class="primary" font-size="16" font-weight="700">开始前检查</text>
+    <text x="20" y="59" class="secondary label">只显示状态，不显示或读取密钥。</text>
+    <path d="M20 82H304" stroke="#D7E0E5"/>
+    <circle cx="28" cy="111" r="8" fill="#087F79"/><path d="m24 111 3 3 6-7" fill="none" stroke="#FFFFFF" stroke-width="1.5"/><text x="48" y="115" class="body status">原始音频不保存</text><text x="48" y="135" class="secondary label">默认隐私策略</text>
+    <circle cx="28" cy="177" r="8" fill="#B93845"/><path d="M28 172v8M28 184v1" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/><text x="48" y="181" class="error status">麦克风权限待确认</text><text x="48" y="201" class="secondary label">开始按钮因此禁用</text>
+    <path d="M20 230H304" stroke="#D7E0E5"/>
+    <text x="20" y="262" class="secondary status" letter-spacing=".5">PROVIDER 状态</text>
+    <text x="20" y="298" class="body note" font-weight="700">iFlytek 实时 ASR</text><text x="20" y="319" class="teal label" font-weight="700">凭据：已配置 · 安全存储</text><text x="20" y="342" class="warning status">协议：ProtocolUnavailable</text>
+    <text x="20" y="380" class="body note" font-weight="700">MiMo 翻译 / 摘要 / Q&amp;A</text><text x="20" y="401" class="secondary label">凭据：未配置 · 不影响原文</text><text x="20" y="424" class="warning status">协议：ProtocolUnavailable</text>
+    <path d="M20 452H304" stroke="#D7E0E5"/>
+    <text x="20" y="484" class="warning status">协议未验证；不发送健康或会议请求。</text>
+    <rect x="20" y="512" width="284" height="48" rx="10" fill="#DCE2E5"/><text x="100" y="542" class="secondary status">开始会议 · 不可用</text>
+    <text x="20" y="586" class="secondary label">1120×700 contract：开始、权限和来源选择固定在可见工作区；</text>
+    <text x="20" y="603" class="secondary label">此静态稿为 1440×900 基准，不证明 reflow 已实现。</text>
+  </g>
+  <text x="232" y="886" class="secondary label">Meeting Master · provisional Apple Design direction; LetShare style not yet verified</text>
+</svg>

@@ -1,0 +1,459 @@
+/* =============================================================================
+   Settings page, AI provider panel and audio-capture diagnostics.
+   Shared primitives (page head, panels, row lists, segmented controls, status
+   dots, soft tags, field labels) are owned by `src/styles.css` and
+   `src/theme/appTheme.ts`; this file only adds the Settings layout.
+   ============================================================================= */
+
+.settings-page {
+  min-width: 0;
+}
+
+/* ------------------------------- Row rhythm ------------------------------- */
+/* label column | control column, hairline separated, one control per row.     */
+.panel-body.settings-rows {
+  gap: 0;
+  padding: var(--sp-2) var(--sp-5);
+}
+
+.settings-row {
+  display: grid;
+  grid-template-columns: clamp(148px, 27%, 248px) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sp-6);
+  min-width: 0;
+  padding-block: var(--sp-4);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.settings-row:last-child {
+  border-bottom: 0;
+}
+
+.settings-row-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.settings-row-control {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+.settings-rows > .settings-note,
+.settings-rows > .MuiAlert-root,
+.settings-rows > .panel-caption {
+  margin-block: var(--sp-2);
+}
+
+/* Palette swatch inside the colour-theme segmented control. */
+.palette-swatch {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  border: 1px solid var(--c-line-3);
+  border-radius: var(--r-full);
+}
+
+/* The shared segmented primitive has no disabled state; keep it neutral grey. */
+.settings-page .segmented-item:disabled {
+  color: var(--c-ink-4);
+  cursor: not-allowed;
+}
+
+/* ------------------------- Quiet metadata and status --------------------- */
+.settings-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  margin: 0;
+  color: var(--c-ink-3);
+  font-size: var(--fs-13);
+  line-height: var(--lh-snug);
+}
+
+.settings-note svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--c-ink-4);
+  font-size: 15px;
+}
+
+.settings-note .status-dot {
+  margin-top: 6px;
+}
+
+.settings-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-timer {
+  color: var(--c-ink);
+  font-size: var(--fs-17);
+  font-weight: var(--fw-medium);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-normal);
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.settings-select {
+  width: 100%;
+  min-width: 0;
+  max-width: 320px;
+}
+
+.settings-select-value {
+  display: block;
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ------------------------------ AI providers ----------------------------- */
+.settings-provider-list {
+  min-width: 0;
+}
+
+.settings-provider {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-bottom: 1px solid var(--c-line);
+}
+
+.settings-provider:last-child {
+  border-bottom: 0;
+}
+
+/* Each provider is wrapped with its inline notices, so the shared row keeps
+   its hairline on the wrapper instead of on the row itself. */
+.settings-provider .list-row {
+  padding-inline: 0;
+  padding-block: var(--sp-4);
+  border-bottom: 0;
+}
+
+.settings-provider-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--c-ink-3);
+  font-size: var(--fs-12);
+  line-height: var(--lh-snug);
+}
+
+/* Provider endpoints are one line of 13px ink-3; the full URL stays in the
+   tooltip instead of wrapping into the row's notices. */
+.settings-provider .list-row-detail {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-provider-sep::before {
+  margin-inline: 6px;
+  content: '·';
+}
+
+.settings-provider .settings-note {
+  padding: 0 0 var(--sp-3) 34px;
+}
+
+.settings-empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-block: var(--sp-2);
+  padding: var(--sp-4);
+}
+
+.settings-empty-copy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.settings-empty-title {
+  color: var(--c-ink);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-snug);
+}
+
+/* Action labels never wrap inside a panel head, a provider row or the empty
+   state: the control keeps its intrinsic width and the copy column shrinks. */
+.settings-page .panel-actions .MuiButton-root,
+.settings-empty > .MuiButton-root,
+.settings-provider .list-row-end .MuiButton-root,
+.settings-actions .MuiButton-root {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* ------------------------------- Diagnostics ------------------------------ */
+/* The capture test surface is one collapsed disclosure, closed by default.   */
+.settings-details {
+  min-width: 0;
+}
+
+.settings-details-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-width: 0;
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  list-style: none;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.settings-details-summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-details-summary:hover {
+  background: var(--c-surface-2);
+}
+
+.settings-details-hint {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.settings-details-chevron {
+  flex: 0 0 auto;
+  color: var(--c-ink-4);
+  font-size: 18px;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.settings-details[open] .settings-details-chevron {
+  transform: rotate(90deg);
+}
+
+.settings-details[open] > .panel-body {
+  border-top: 1px solid var(--c-line);
+}
+
+/* ---------------------------- Audio diagnostics --------------------------- */
+.settings-sources {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  min-width: 0;
+  padding-block: var(--sp-3);
+}
+
+.audio-source {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  min-width: 0;
+  padding: var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--c-surface-2);
+}
+
+.audio-source-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.audio-source-icon {
+  display: inline-flex;
+  color: var(--c-ink-4);
+}
+
+.audio-source-icon svg {
+  font-size: 17px;
+}
+
+.audio-source-name {
+  color: var(--c-ink);
+  font-size: var(--fs-13);
+  font-weight: var(--fw-medium);
+}
+
+.audio-source-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  color: var(--c-ink-3);
+  font-size: var(--fs-12);
+  white-space: nowrap;
+}
+
+.audio-source-device {
+  overflow: hidden;
+  color: var(--c-ink-3);
+  font-size: var(--fs-12);
+  line-height: var(--lh-snug);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.audio-meter {
+  overflow: hidden;
+  height: 4px;
+  border-radius: var(--r-full);
+  background: var(--c-surface-4);
+}
+
+.audio-meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-full);
+  background: var(--brand);
+  transition: width 100ms linear;
+}
+
+.audio-meter-value {
+  color: var(--c-ink-3);
+  font-size: var(--fs-12);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh-snug);
+}
+
+.audio-source-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px var(--sp-3);
+  margin: 0;
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--c-line);
+}
+
+.audio-source-stats > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.audio-source-stats dt {
+  color: var(--c-ink-3);
+  font-size: var(--fs-12);
+}
+
+.audio-source-stats dd {
+  margin: 0;
+  color: var(--c-ink-2);
+  font-size: var(--fs-12);
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-output {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  margin-block: var(--sp-2);
+  padding: var(--sp-4);
+}
+
+.settings-output-path {
+  margin: 0;
+  color: var(--c-ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  line-height: var(--lh-snug);
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------- Provider dialog --------------------------- */
+.agent-provider-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.agent-provider-manual {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--c-surface-2);
+}
+
+.agent-provider-manual-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.agent-provider-manual-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+/* -------------------------------- Responsive ------------------------------ */
+@container route-content (max-width: 560px) {
+  .settings-row {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--sp-2);
+  }
+
+  .settings-row-control {
+    flex-wrap: wrap;
+  }
+
+  .settings-sources {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-empty {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .settings-provider .list-row {
+    flex-wrap: wrap;
+  }
+
+  .settings-provider .list-row-end {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .settings-provider .settings-note {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .agent-provider-manual-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .audio-meter-fill,
+  .settings-details-chevron,
+  .settings-details-summary {
+    transition: none !important;
+  }
+}

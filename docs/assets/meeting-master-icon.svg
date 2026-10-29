@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Meeting Master" focusable="false" shape-rendering="geometricPrecision">
+  <title>Meeting Master</title>
+  <desc>Original Meeting Master mark: a clear M-shaped meeting signal with two source points. The bundled icon intentionally has no caption so it remains legible at taskbar sizes.</desc>
+  <rect x="10" y="10" width="236" height="236" rx="54" fill="#173248"/>
+  <circle cx="54" cy="170" r="14" fill="#63D6C5"/>
+  <circle cx="202" cy="170" r="14" fill="#8CA7FF"/>
+  <path d="M70 170V91l58 65 58-65v79" fill="none" stroke="#F7FAFB" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M54 202h148" fill="none" stroke="#BFD0D8" stroke-width="10" stroke-linecap="round"/>
+</svg>

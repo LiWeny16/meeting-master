@@ -1,0 +1,243 @@
+/* =============================================================================
+   Summary page (/meetings/:id/summary) — reading surface after a meeting.
+   Owns only what is unique to this page: the two-column workspace, the recap
+   prose, the action rows and the context sidebar groups.
+   Shared primitives (.page-head, .panel*, .row-list, .list-row*, .meta-line,
+   .panel-subtle, .loading-panel, .status-dot) live in src/styles.css.
+   ============================================================================= */
+
+/* Metadata under the meeting title: dates and durations must not reflow. */
+.summary-meta {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------- Workspace -------------------------------- */
+.summary-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+
+.summary-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+
+@container route-content (min-width: 1100px) {
+  .summary-workspace {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+    gap: var(--sp-5);
+  }
+}
+
+/* --------------------------------- Recap ---------------------------------- */
+.summary-recap-text {
+  max-width: 72ch;
+  color: var(--c-ink-2);
+  font-size: var(--fs-15);
+  line-height: var(--lh-relaxed);
+  white-space: pre-wrap;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.summary-count {
+  color: var(--c-ink-3);
+  font-size: var(--fs-13);
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-empty {
+  padding: var(--sp-3) var(--sp-4);
+  color: var(--c-ink-3);
+  font-size: var(--fs-13);
+  line-height: var(--lh-normal);
+  text-wrap: pretty;
+}
+
+/* ------------------------------- Action rows ------------------------------- */
+/* .list-row centres its children; action rows carry three lines, so the mark
+   must sit on the first line. Specificity beats .list-row on purpose. */
+.summary-action.list-row {
+  align-items: flex-start;
+}
+
+.summary-action-mark {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  color: var(--c-ink-4);
+}
+
+.summary-action-mark svg {
+  font-size: var(--fs-17);
+}
+
+.summary-action.is-complete .summary-action-mark {
+  color: var(--c-success);
+}
+
+.summary-action-text {
+  color: var(--c-ink);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-normal);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.summary-action.is-complete .summary-action-text {
+  color: var(--c-ink-3);
+  text-decoration: line-through;
+  text-decoration-color: var(--c-line-3);
+}
+
+.summary-state {
+  flex: 0 0 auto;
+  padding-top: 2px;
+  color: var(--c-ink-3);
+  font-size: var(--fs-12);
+  white-space: nowrap;
+}
+
+.summary-state.is-complete {
+  color: var(--c-success);
+}
+
+/* Transcript moments cited by an action item. Quiet inline links, not chips. */
+.summary-sources {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+}
+
+.summary-sources-label {
+  color: var(--c-ink-4);
+  font-size: var(--fs-12);
+}
+
+.summary-source {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-full);
+  color: var(--c-ink-3);
+  font-size: var(--fs-12);
+  font-variant-numeric: tabular-nums;
+  transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+.summary-source:hover {
+  border-color: var(--c-line-3);
+  color: var(--c-ink);
+}
+
+/* ------------------------------ Context aside ------------------------------ */
+.summary-context {
+  align-self: start;
+}
+
+.summary-context-section {
+  display: grid;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.summary-context-section + .summary-context-section {
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--c-line);
+}
+
+.summary-context-label {
+  color: var(--c-ink-3);
+  font-size: var(--fs-13);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-normal);
+}
+
+.summary-context-text {
+  color: var(--c-ink-2);
+  font-size: var(--fs-14);
+  line-height: var(--lh-normal);
+  white-space: pre-wrap;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.summary-context-text.is-empty {
+  color: var(--c-ink-4);
+}
+
+.summary-path.is-empty {
+  color: var(--c-ink-3);
+}
+
+.summary-transcript {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 32px;
+  margin-inline: calc(var(--sp-2) * -1);
+  padding: 0 var(--sp-2);
+  border-radius: var(--r-sm);
+  color: var(--c-ink-2);
+  font-size: var(--fs-14);
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.summary-transcript:hover {
+  color: var(--c-ink);
+  background: var(--c-surface-2);
+}
+
+.summary-transcript svg {
+  flex: 0 0 auto;
+  color: var(--c-ink-4);
+  font-size: var(--fs-15);
+}
+
+.summary-transcript-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.summary-transcript-count {
+  color: var(--c-ink-3);
+  font-size: var(--fs-12);
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-transcript .summary-transcript-chevron {
+  font-size: var(--fs-17);
+}
+
+.summary-path {
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-sm);
+  background: var(--c-surface-2);
+  color: var(--c-ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  line-height: var(--lh-normal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .summary-source,
+  .summary-transcript {
+    transition: none;
+  }
+}

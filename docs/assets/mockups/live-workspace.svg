@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-labelledby="live-workspace-title live-workspace-desc" shape-rendering="geometricPrecision">
+  <title id="live-workspace-title">Meeting Master — live workspace</title>
+  <desc id="live-workspace-desc">A transcript-first Windows desktop workspace. The static sample makes independent source runtime states and the fail-closed ProtocolUnavailable state visible without implying provider processing.</desc>
+  <style>
+    text { font-family: 'Microsoft YaHei UI', 'Segoe UI Variable', 'Segoe UI', 'Noto Sans CJK SC', sans-serif; }
+    .primary { fill: #132230; }
+    .body { fill: #263944; }
+    .secondary { fill: #50616C; }
+    .teal { fill: #087F79; }
+    .blue { fill: #194FAF; }
+    .warning { fill: #875500; }
+    .error { fill: #A52D3B; }
+    .label { font-size: 11px; }
+    .note { font-size: 12px; }
+    .status { font-size: 13px; font-weight: 700; }
+  </style>
+
+  <rect width="1440" height="900" fill="#F4F7F8"/>
+  <rect width="1440" height="64" fill="#F9FBFC"/>
+  <path d="M0 63.5H1440" stroke="#D4DEE3"/>
+
+  <rect x="20" y="15" width="34" height="34" rx="10" fill="#173248"/>
+  <path d="M29 40V25l8 9 8-9v15" fill="none" stroke="#F7FAFB" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="26" cy="40" r="2.2" fill="#63D6C5"/><circle cx="48" cy="40" r="2.2" fill="#8CA7FF"/>
+  <text x="68" y="36" class="primary" font-size="15" font-weight="700">Meeting Master</text>
+  <text x="68" y="51" class="secondary label">实时工作台</text>
+  <path d="M224 20v24" stroke="#D4DEE3"/>
+  <text x="248" y="30" class="primary" font-size="14" font-weight="700">Q3 产品评审</text>
+  <text x="248" y="48" class="secondary label">录制中 · 00:18:42 · 云端能力降级</text>
+  <circle cx="455" cy="32" r="5" fill="#C23D4A"/>
+  <text x="468" y="37" class="error status">录音中</text>
+  <text x="1000" y="37" class="secondary note">Ctrl + K 搜索</text>
+  <rect x="1148" y="12" width="116" height="40" rx="10" fill="#EEF3F5" stroke="#C9D6DC"/>
+  <circle cx="1170" cy="32" r="5" fill="#875500"/><text x="1184" y="37" class="warning status">一路异常</text>
+  <rect x="1276" y="12" width="144" height="40" rx="10" fill="#FFFFFF" stroke="#B93845"/>
+  <circle cx="1298" cy="32" r="5" fill="#B93845"/><text x="1312" y="37" class="error status">结束会议</text>
+
+  <rect y="64" width="204" height="836" fill="#ECF2F4"/>
+  <path d="M203.5 64V900" stroke="#D4DEE3"/>
+  <text x="20" y="98" class="secondary status">当前会议</text>
+  <rect x="12" y="112" width="180" height="44" rx="9" fill="#DCE8ED"/>
+  <rect x="12" y="112" width="3" height="44" rx="1.5" fill="#087F79"/>
+  <circle cx="31" cy="134" r="5" fill="#C23D4A"/>
+  <text x="47" y="131" class="primary" font-size="12.5" font-weight="700">实时转写</text>
+  <text x="47" y="147" class="secondary label">本地快照 · 00:18:42</text>
+  <text x="20" y="192" class="secondary status">章节</text>
+  <circle cx="27" cy="220" r="3.5" fill="#087F79"/><text x="40" y="224" class="body note">用户反馈与留存</text><text x="40" y="242" class="secondary label">00:08:12</text>
+  <circle cx="27" cy="272" r="3.5" fill="#2D6CDF"/><text x="40" y="276" class="body note">路线图与排期</text><text x="40" y="294" class="secondary label">00:15:34</text>
+  <text x="20" y="329" class="secondary label">识别到议题后会自动生成</text>
+  <path d="M20 358H184" stroke="#D2DDE2"/>
+  <text x="20" y="389" class="secondary status">来源快照</text>
+  <circle cx="26" cy="418" r="5" fill="#087F79"/><text x="40" y="422" class="body note" font-weight="600">系统输出</text>
+  <text x="40" y="440" class="teal label">capture 正常 · signal 活跃</text><text x="40" y="458" class="secondary label">ASR：ProtocolUnavailable</text>
+  <circle cx="26" cy="494" r="5" fill="#B93845"/><text x="40" y="498" class="body note" font-weight="600">麦克风</text>
+  <text x="40" y="516" class="error status">capture 正常 · NoSignal</text><text x="40" y="534" class="secondary label">ASR：ProtocolUnavailable</text>
+  <path d="M20 820H184" stroke="#D2DDE2"/>
+  <text x="20" y="850" class="secondary label">详情诊断在设置中查看</text>
+
+  <g transform="translate(232 88)">
+    <text x="0" y="28" class="primary" font-size="23" font-weight="700" letter-spacing="-.015em">实时转写</text>
+    <text x="0" y="52" class="secondary note">当前显示已落库快照；云端能力按 provider 状态降级，不代表正在发送新请求。</text>
+    <rect x="558" y="0" width="282" height="42" rx="9" fill="#FFFFFF" stroke="#D4DEE3"/>
+    <circle cx="580" cy="20" r="6.5" fill="none" stroke="#50616C" stroke-width="1.6"/><path d="m585 25 5 5" stroke="#50616C" stroke-width="1.6" stroke-linecap="round"/>
+    <text x="600" y="25" class="secondary note">搜索本次会议</text>
+    <path d="M708 10v22M778 10v22" stroke="#D4DEE3"/>
+    <text x="720" y="25" class="blue note" font-weight="700">全部</text><text x="777" y="25" class="secondary note">原文</text><text x="822" y="25" class="secondary note">译文</text>
+  </g>
+
+  <rect x="232" y="152" width="840" height="42" rx="9" fill="#FFF8ED" stroke="#E4C486"/>
+  <circle cx="254" cy="173" r="8" fill="#875500"/><path d="M254 168v7M254 179v1" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
+  <text x="272" y="178" class="warning status">Provider 状态：ProtocolUnavailable · iFlytek / MiMo 不发送请求</text>
+
+  <g transform="translate(232 210)">
+    <rect width="840" height="98" fill="#FFFFFF"/>
+    <rect width="3" height="98" rx="1.5" fill="#087F79"/>
+    <text x="22" y="22" class="teal status">系统输出 · 00:18:12 · final 快照</text>
+    <text x="22" y="53" class="primary" font-size="15" font-weight="600">我们先看本季度的留存变化，核心指标已经回到目标线以上。</text>
+    <text x="22" y="80" class="secondary status">译文：ProtocolUnavailable · 未发送；原文仍可读</text>
+    <path d="M0 98H840" stroke="#DDE5E8"/>
+  </g>
+  <g transform="translate(232 314)">
+    <rect width="840" height="112" fill="#FFFFFF"/>
+    <rect width="3" height="112" rx="1.5" fill="#2D6CDF"/>
+    <text x="22" y="22" class="blue status">麦克风 · 00:18:28 · final 快照</text>
+    <text x="22" y="53" class="primary" font-size="15" font-weight="600">这里建议把新用户引导拆成两步，先让人看到价值，再解释设置。</text>
+    <text x="22" y="80" class="secondary status">译文：ProtocolUnavailable · 未发送；原文仍可读</text>
+    <text x="22" y="103" class="blue label" font-weight="700">引用到 Q&amp;A · 00:18:28</text>
+    <path d="M0 112H840" stroke="#DDE5E8"/>
+  </g>
+  <g transform="translate(232 432)">
+    <rect width="840" height="116" fill="#FFFFFF"/>
+    <rect width="3" height="116" rx="1.5" fill="#B93845"/>
+    <text x="22" y="22" class="error status">麦克风 · 00:18:42 · NoSignal</text>
+    <text x="22" y="54" class="primary" font-size="15" font-weight="600">新的识别结果待来源恢复和已验证 ASR。</text>
+    <text x="22" y="82" class="secondary note">保留上一稳定快照；不把无信号伪装成 partial 或 final。</text>
+    <text x="22" y="106" class="error status">恢复设备后可重试；当前不会发送请求</text>
+    <path d="M0 116H840" stroke="#DDE5E8"/>
+  </g>
+
+  <rect x="232" y="568" width="840" height="38" rx="19" fill="#EAF0F2" stroke="#C9D6DC"/>
+  <text x="254" y="592" class="primary" font-size="11.5" font-weight="700">本地快照已保留</text><text x="382" y="592" class="secondary note">新片段等待来源/协议恢复 · 查看最新转写</text>
+
+  <g transform="translate(232 630)">
+    <path d="M0 0H840" stroke="#C9D6DC"/>
+    <text x="0" y="24" class="secondary label">来源电平与独立运行状态</text>
+    <text x="0" y="50" class="teal status">系统输出</text><rect x="86" y="43" width="112" height="7" rx="3.5" fill="#DDE7E9"/><rect x="86" y="43" width="81" height="7" rx="3.5" fill="#087F79"/><text x="210" y="50" class="teal label">capture 正常 · ASR 未建立</text>
+    <text x="0" y="76" class="error status">麦克风</text><rect x="86" y="69" width="112" height="7" rx="3.5" fill="#F0D9DC"/><rect x="86" y="69" width="18" height="7" rx="3.5" fill="#B93845"/><text x="210" y="76" class="error status">NoSignal · queue 0 ms · latency —</text>
+    <circle cx="450" cy="45" r="25" fill="#875500"/><path d="M442 35v20M458 35v20" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/><text x="421" y="86" class="body note" font-weight="700">暂停录音</text>
+    <text x="586" y="28" class="secondary label">00:18:42 · 原始音频不保存</text>
+    <rect x="586" y="42" width="156" height="40" rx="10" fill="#FFFFFF" stroke="#B93845"/><circle cx="609" cy="62" r="5" fill="#B93845"/><text x="626" y="67" class="error status">结束会议</text>
+  </g>
+
+  <g transform="translate(1096 88)">
+    <rect width="324" height="700" rx="14" fill="#FFFFFF" stroke="#D1DDE2"/>
+    <text x="20" y="30" class="primary" font-size="15" font-weight="700">会议伴侣</text><text x="268" y="30" class="blue note">收起</text>
+    <path d="M20 52H304" stroke="#D7E0E5"/>
+    <text x="20" y="84" class="blue note" font-weight="700">摘要</text><text x="92" y="84" class="secondary note">Q&amp;A</text><path d="M20 96h38" stroke="#2D6CDF" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="20" y="128" class="primary" font-size="17" font-weight="700">摘要暂不可用</text>
+    <circle cx="282" cy="123" r="4" fill="#875500"/><text x="20" y="153" class="warning status">状态：ProtocolUnavailable</text>
+    <text x="20" y="176" class="secondary label">不会发送摘要请求；原有快照继续保留</text>
+    <path d="M20 198h284" stroke="#D7E0E5"/>
+    <text x="20" y="228" class="secondary status">上一稳定快照</text>
+    <text x="20" y="257" class="body note" font-weight="600">先验证新用户引导，再扩大功能范围。</text>
+    <text x="20" y="281" class="teal label">依据 00:18:28 · 麦克风 · 仅本地快照</text>
+    <text x="20" y="310" class="warning status">重试：协议未验证（禁用）</text>
+    <path d="M20 336h284" stroke="#D7E0E5"/>
+    <text x="20" y="368" class="secondary status">Q&amp;A 状态样本</text>
+    <text x="20" y="395" class="body note">当前会话 · 已纳入 18:42</text>
+    <text x="20" y="419" class="secondary label">范围：current_session · 引用 00:18:28</text>
+    <text x="20" y="447" class="warning status">无可用 MiMo provider</text><text x="20" y="468" class="warning status">ProtocolUnavailable · 不发送问题</text>
+    <rect x="20" y="486" width="284" height="54" rx="9" fill="#EEF3F5" stroke="#D7E0E5"/>
+    <text x="36" y="519" class="secondary status">输入问题（ProtocolUnavailable）</text>
+    <text x="20" y="571" class="secondary label">无证据时显示“记录中没有足够依据”</text>
+    <text x="20" y="594" class="secondary label">失败/取消会保留问题和部分答案</text>
+    <path d="M20 604h284" stroke="#D7E0E5"/>
+    <text x="20" y="628" class="secondary label" font-weight="700">模式静态样本</text>
+    <text x="20" y="650" class="secondary label">减少动效：无 pulse / 自动滚动</text>
+    <text x="20" y="672" class="secondary label">减少透明度：实色 surface</text>
+    <text x="20" y="694" class="secondary label">高对比：边框 + 焦点环</text>
+  </g>
+
+  <text x="1096" y="812" class="secondary label">1120×700 contract：导航可隐藏；伴侣默认关闭；</text>
+  <text x="1096" y="830" class="secondary label">打开时为 304px drawer，底部控制 sticky，不挤压正文。</text>
+  <text x="232" y="886" class="secondary label">Meeting Master · provisional Apple Design direction; LetShare style not yet verified</text>
+</svg>

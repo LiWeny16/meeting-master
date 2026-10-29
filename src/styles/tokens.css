@@ -1,0 +1,332 @@
+/* =============================================================================
+   Meeting Master — Design Tokens (single source of truth)
+   -----------------------------------------------------------------------------
+   Rules enforced across the codebase:
+   1. Radii    : only --r-xs | --r-sm | --r-md | --r-lg | --r-full
+   2. Type     : only --fs-* scale. Never a raw px font-size.
+   3. Color    : only --c-* / --brand* / --c-success|warning|danger. No raw hex.
+   4. Elevation: only --sh-1 | --sh-2 | --sh-3. Flat surfaces use no shadow.
+   5. Space    : multiples of 4 via --sp-*.
+   6. Brand    : < 5% of painted area. Primary action is near-black, never brand.
+   ============================================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* ---- Typography -------------------------------------------------------- */
+  --font-sans: "Inter", "Inter var", "Segoe UI Variable Text", "Segoe UI Variable",
+    -apple-system, BlinkMacSystemFont, "Noto Sans SC", "PingFang SC",
+    "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", ui-monospace, Consolas, "Courier New", monospace;
+
+  --fs-11: 0.6875rem;
+  --fs-12: 0.75rem;
+  --fs-13: 0.8125rem;
+  --fs-14: 0.875rem;
+  --fs-15: 0.9375rem;
+  --fs-17: 1.0625rem;
+  --fs-20: 1.25rem;
+  --fs-24: 1.5rem;
+  --fs-28: 1.75rem;
+  --fs-34: 2.125rem;
+
+  --lh-tight: 1.25;
+  --lh-snug: 1.4;
+  --lh-normal: 1.55;
+  --lh-relaxed: 1.7;
+
+  /* Chinese text must never be negatively tracked. Only small caps Latin labels. */
+  --ls-tight: -0.01em;
+  --ls-normal: 0;
+  --ls-caps: 0.06em;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* ---- Radii ------------------------------------------------------------- */
+  --r-2xs: 4px;  /* micro only: inline code, 2-letter avatars, progress caps */
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-full: 999px;
+
+  /* ---- Spacing ----------------------------------------------------------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* ---- Neutral scale (light) -------------------------------------------- */
+  --c-canvas: #f1f3f6;  /* palette-tinted: see :root[data-palette] */
+  --c-canvas-2: #e9ecf1;
+  --c-surface: #ffffff;
+  --c-surface-2: #fafafb;
+  --c-surface-3: #f2f2f4;
+  --c-surface-4: #e8e8eb;
+
+  --c-ink: #111113;
+  --c-ink-2: #4c4c55;
+  --c-ink-3: #83838d;
+  --c-ink-4: #a6a6af;
+
+  --c-line: #e8e8ea;
+  --c-line-2: #dcdce0;
+  --c-line-3: #cacad1;
+
+  /* ---- Primary action: near-black, not brand ---------------------------- */
+  --c-action: #111113;
+  --c-action-hover: #000000;
+  --c-action-ink: #ffffff;
+  --c-action-soft: #f2f2f4;
+
+  /* Accent used where the palette must be legible: selected navigation and
+     the 2px selection bar. Surfaces stay neutral. */
+  --nav-accent: var(--brand);
+  --nav-accent-ink: var(--brand-ink);
+
+  /* ---- Brand: state, selection, focus only ------------------------------ */
+  --brand: #1f6e90;
+  --brand-strong: #175872;
+  --brand-ink: #1a5d79;
+  --brand-soft: #eef3f6;
+  --brand-wash: #f6f9fa;
+
+  /* ---- Semantic --------------------------------------------------------- */
+  --c-success: #12805c;
+  --c-success-soft: #e9f5f0;
+  --c-warning: #a86412;
+  --c-warning-soft: #fbf3e6;
+  --c-danger: #c43d3d;
+  --c-danger-soft: #fbeeee;
+  --c-violet: #63628c;
+  --c-violet-soft: #f0f0f6;
+  --c-peach: #a65f49;
+  --c-peach-soft: #f9f1ed;
+
+  /* ---- Elevation -------------------------------------------------------- */
+  --sh-1: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.03);
+  --sh-2: 0 2px 4px rgba(16, 24, 40, 0.03), 0 8px 20px rgba(16, 24, 40, 0.05);
+  --sh-3: 0 4px 8px rgba(16, 24, 40, 0.04), 0 20px 48px rgba(16, 24, 40, 0.08);
+
+  /* ---- Motion ----------------------------------------------------------- */
+  --ease-out: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 280ms;
+
+  /* ---- Shell geometry --------------------------------------------------- */
+  --titlebar-height: 44px;
+  --sidebar-width: 216px;
+  --rail-width: 340px;
+  --frame-gap: 12px;
+  --content-max: 1120px;
+
+  /* =========================================================================
+     Legacy aliases — kept so not-yet-migrated stylesheets inherit the new
+     palette instead of the old sky-blue system. Migrated files should stop
+     using these and reference --c-* directly.
+     ========================================================================= */
+  --canvas: var(--c-canvas);
+  --surface: var(--c-surface);
+  --surface-raised: var(--c-surface-2);
+  --ink: var(--c-ink);
+  --muted: var(--c-ink-2);
+  --quiet: var(--c-ink-3);
+  --line: var(--c-line);
+  --line-strong: var(--c-line-2);
+
+  --accent: var(--brand);
+  --accent-strong: var(--brand-strong);
+  --accent-ink: var(--brand-ink);
+  --accent-soft: var(--brand-soft);
+  --accent-wash: var(--brand-wash);
+
+  --mint: var(--c-success);
+  --mint-soft: var(--c-success-soft);
+  --violet: var(--c-violet);
+  --violet-soft: var(--c-violet-soft);
+  --peach: var(--c-peach);
+  --peach-soft: var(--c-peach-soft);
+  --warning-soft: var(--c-warning-soft);
+  --warning-ink: var(--c-warning);
+  --danger: var(--c-danger);
+  --danger-soft: var(--c-danger-soft);
+
+  --shadow-soft: var(--sh-1);
+  --shadow-card: var(--sh-2);
+  --radius-control: var(--r-sm);
+  --radius-card: var(--r-md);
+  --radius-panel: var(--r-lg);
+
+  --type-xs: var(--fs-13);
+  --type-sm: var(--fs-14);
+  --type-title: var(--fs-17);
+}
+
+/* =========================== Brand palettes ================================ */
+/* Palette = canvas temperature + one accent that is actually painted. The
+   primary action stays near-black in every palette. */
+:root[data-palette='sky'] {
+  --c-canvas: #f1f3f6;
+  --c-canvas-2: #e9ecf1;
+}
+
+:root[data-palette='mint'] {
+  --c-canvas: #eff4f1;
+  --c-canvas-2: #e6ede9;
+  --brand: #136b5f;
+  --brand-strong: #0e5348;
+  --brand-ink: #135f55;
+  --brand-soft: #ecf4f2;
+  --brand-wash: #f5faf8;
+}
+
+:root[data-palette='graphite'] {
+  --c-canvas: #f1f2f4;
+  --c-canvas-2: #e8eaee;
+  --brand: #3f5265;
+  --brand-strong: #2e3f4f;
+  --brand-ink: #36495b;
+  --brand-soft: #eef1f4;
+  --brand-wash: #f7f8fa;
+}
+
+/* ================================ Dark ===================================== */
+:root[data-appearance='dark'] {
+  color-scheme: dark;
+
+  --c-canvas: #0c0d0f;
+  --c-canvas-2: #08090a;
+  --c-surface: #161719;
+  --c-surface-2: #1b1c1f;
+  --c-surface-3: #212226;
+  --c-surface-4: #2a2b30;
+
+  --c-ink: #f4f4f6;
+  --c-ink-2: #b3b3bc;
+  --c-ink-3: #84848d;
+  --c-ink-4: #66666e;
+
+  --c-line: rgba(255, 255, 255, 0.085);
+  --c-line-2: rgba(255, 255, 255, 0.14);
+  --c-line-3: rgba(255, 255, 255, 0.22);
+
+  /* Inverted primary: a light button is the premium dark-mode action. */
+  --c-action: #f4f4f6;
+  --c-action-hover: #ffffff;
+  --c-action-ink: #111113;
+  --c-action-soft: rgba(255, 255, 255, 0.09);
+
+  --brand: #6cb6d6;
+  --brand-strong: #93cde5;
+  --brand-ink: #8cc8e0;
+  --brand-soft: rgba(108, 182, 214, 0.14);
+  --brand-wash: rgba(108, 182, 214, 0.07);
+
+  --c-success: #4ec9a0;
+  --c-success-soft: rgba(78, 201, 160, 0.13);
+  --c-warning: #e0b062;
+  --c-warning-soft: rgba(224, 176, 98, 0.13);
+  --c-danger: #ef8080;
+  --c-danger-soft: rgba(239, 128, 128, 0.13);
+  --c-violet: #a7a4d8;
+  --c-violet-soft: rgba(167, 164, 216, 0.13);
+  --c-peach: #d79c86;
+  --c-peach-soft: rgba(215, 156, 134, 0.13);
+
+  --sh-1: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --sh-2: 0 2px 6px rgba(0, 0, 0, 0.4), 0 10px 24px rgba(0, 0, 0, 0.45);
+  --sh-3: 0 6px 12px rgba(0, 0, 0, 0.45), 0 24px 56px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-palette='mint'][data-appearance='dark'] {
+  --c-canvas: #0b0f0e;
+  --c-canvas-2: #070a09;
+  --c-surface: #151917;
+  --c-surface-2: #1a1e1c;
+  --c-surface-3: #202422;
+  --c-surface-4: #282c2a;
+  --brand: #6fd0bf;
+  --brand-strong: #96ddd0;
+  --brand-ink: #86d7c8;
+  --brand-soft: rgba(111, 208, 191, 0.14);
+  --brand-wash: rgba(111, 208, 191, 0.07);
+}
+
+:root[data-palette='graphite'][data-appearance='dark'] {
+  --c-canvas: #0c0d10;
+  --c-canvas-2: #08090b;
+  --c-surface: #16171b;
+  --c-surface-2: #1b1c20;
+  --c-surface-3: #212227;
+  --c-surface-4: #2a2b31;
+  --brand: #9db2c6;
+  --brand-strong: #c2d2e0;
+  --brand-ink: #b3c6d7;
+  --brand-soft: rgba(157, 178, 198, 0.14);
+  --brand-wash: rgba(157, 178, 198, 0.07);
+}
+
+/* ================================ Base ===================================== */
+* { box-sizing: border-box; }
+
+html {
+  min-width: 320px;
+  background: var(--c-canvas);
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-line-3) transparent;
+}
+
+body {
+  margin: 0;
+  background: var(--c-canvas);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-15);
+  line-height: var(--lh-normal);
+  font-feature-settings: "kern" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 { margin: 0; color: var(--c-ink); letter-spacing: var(--ls-normal); }
+p { margin: 0; }
+
+button, input, textarea, select { font: inherit; color: inherit; }
+button { color: inherit; }
+a { color: inherit; text-decoration: none; }
+
+::selection { background: color-mix(in srgb, var(--brand) 20%, transparent); }
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/*
+ * Scrollbars: app-level scrolling surfaces use the overlay renderer in
+ * `src/styles/scroll.css`. Anything else (textareas, code blocks, menus that
+ * opt out) keeps a standard, quiet thin bar — deliberately NOT customised with
+ * ::-webkit-scrollbar, because styling it is what turns WebView2's auto-hiding
+ * overlay scrollbar into a space-taking classic one.
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

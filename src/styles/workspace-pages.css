@@ -1,0 +1,69 @@
+/* =============================================================================
+   Workspace pages — knowledge library and meeting identities.
+   Both pages are built almost entirely from shared primitives in src/styles.css
+   (.page-head, .row-list, .list-row*, .meta-line, .panel-subtle, .empty-state,
+   .loading-panel). Only the few page-specific details live here.
+   ============================================================================= */
+
+/* ------------------------------ Knowledge -------------------------------- */
+/* Local-only data notice: an inline row under the page head, not an alert. */
+.knowledge-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.knowledge-note > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--c-ink-4);
+  font-size: var(--fs-15);
+}
+
+.knowledge-note p {
+  color: var(--c-ink-3);
+  font-size: var(--fs-13);
+  line-height: var(--lh-normal);
+  text-wrap: pretty;
+}
+
+/* Single quiet counter line — the library has no list to render yet. */
+.knowledge-stat {
+  align-items: center;
+}
+
+.knowledge-stat strong {
+  color: var(--c-ink);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------ Identities ------------------------------- */
+.identity-list .list-row {
+  align-items: flex-start;
+  padding-inline: 0;
+  padding-block: var(--sp-3);
+}
+
+.identity-monogram {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-top: 1px;
+  border-radius: var(--r-full);
+  background: var(--c-surface-3);
+  color: var(--c-ink-2);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.identity-role {
+  color: var(--c-ink-3);
+  font-size: var(--fs-13);
+  line-height: var(--lh-snug);
+}

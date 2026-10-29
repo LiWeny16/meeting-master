@@ -1,0 +1,64 @@
+/* Lucian UX/UI Prompt #038 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#038
+   Ported: `.u038-menu` → `.lx-ctx`, `--ux-*` → project tokens. Motion values
+   (opacity .15s, transform .35s, height .4s) are the element's own. */
+
+.lx-ctx {
+  position: fixed;
+  z-index: 2000;
+  width: 208px;
+  padding: 6px;
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  box-shadow: 0 0 0 1px var(--c-line), var(--sh-3);
+  overflow: hidden;
+  animation: lx-ctx-in 0.35s var(--ease-out);
+}
+
+@keyframes lx-ctx-in {
+  from { opacity: 0; transform: scale(0.85); }
+  40% { opacity: 1; }
+  to { opacity: 1; transform: none; }
+}
+
+.lx-ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--r-xs);
+  color: var(--c-ink);
+  background: none;
+  font-size: var(--fs-13);
+  font-weight: var(--fw-medium);
+  text-align: left;
+  cursor: default;
+}
+
+.lx-ctx-item:hover,
+.lx-ctx-item:focus-visible { background: var(--c-surface-2); outline: none; }
+.lx-ctx-item:focus-visible { box-shadow: inset 0 0 0 2px var(--brand); }
+.lx-ctx-item:disabled { color: var(--c-ink-4); cursor: default; }
+.lx-ctx-item:disabled:hover { background: none; }
+
+.lx-ctx-icon { display: grid; place-items: center; width: 17px; height: 17px; flex: none; color: var(--c-ink-3); }
+.lx-ctx-icon svg { width: 17px; height: 17px; }
+.lx-ctx-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.lx-ctx-item kbd {
+  margin-left: auto;
+  color: var(--c-ink-4);
+  font-family: inherit;
+  font-size: var(--fs-11);
+}
+
+.lx-ctx-item.is-danger,
+.lx-ctx-item.is-danger .lx-ctx-icon { color: var(--c-danger); }
+
+.lx-ctx-sep { height: 1px; margin: 5px 8px; background: var(--c-line); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lx-ctx { animation: none; }
+}

@@ -1,0 +1,32 @@
+# Environment and secrets
+.meeting-master-env/
+.env
+.env.*
+!.env.example
+
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+.vite/
+
+# Local logs, native development state, and editor artifacts
+.local/
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Local meeting data and generated staging files
+/data/
+/agent-runtime/runtime/
+/agent-runtime/.node-package-staging/
+/agent-runtime/.dependencies.sha256
+/nul
+/docs/meeting-master-preview/
+# Local research snapshots and internal planning material
+/claude-cli.html
+/docs/superpowers/
+/docs/delivery-record.md

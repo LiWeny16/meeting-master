@@ -1,0 +1,359 @@
+/* =============================================================================
+   Models & ASR — page layer only.
+   Shared primitives (.page-head, .section-head, .panel, .list-row, .meta-line,
+   .soft-tag, .status-dot, .loading-panel) are defined in src/styles.css and are
+   consumed here, never redefined. Everything below belongs to ModelsPage.tsx.
+   ============================================================================= */
+
+/* Page scope: owns the page's horizontal rhythm. */
+.models-page { --models-row-pad: var(--sp-5); }
+
+/* --------------------------------- Notices -------------------------------- */
+/* Capability / platform notices: one quiet inline row, never a full-width alert. */
+.meta-line.models-notice {
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  gap: var(--sp-2);
+}
+
+.meta-line.models-notice > .status-dot { margin-top: 5px; }
+
+.models-notice-text { min-width: 0; }
+
+/* -------------------------------- Sections -------------------------------- */
+.models-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+/* --------------------------- Status strips at the top ---------------------- */
+/* GPU / VRAM / RAM / tier live in a single compact row, not a page section. */
+.meta-line.models-engine-line { gap: var(--sp-2); }
+
+.meta-line.models-engine-line svg,
+.meta-line.models-hardware-line svg {
+  width: 15px;
+  height: 15px;
+}
+
+.models-status-value {
+  color: var(--c-ink);
+  font-weight: var(--fw-medium);
+}
+
+.models-hardware-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2) var(--sp-3);
+  min-height: 32px;
+}
+
+/* --------------------------------- Toolbar -------------------------------- */
+.models-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+  min-width: 0;
+  padding: var(--sp-3) var(--models-row-pad);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.models-mirror-select { flex: 0 0 auto; min-width: 180px; }
+
+.meta-line.models-storage {
+  flex: 1 1 240px;
+  flex-wrap: nowrap;
+}
+
+.models-toolbar-end {
+  display: inline-flex;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.models-path {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--c-ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  line-height: var(--lh-snug);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --------------------------------- Row lists ------------------------------- */
+.models-list { padding-block: var(--sp-1); }
+
+.models-list > .list-row { padding-inline: var(--models-row-pad); }
+
+.models-model-row.list-row,
+.models-provider-row.list-row {
+  align-items: flex-start;
+  flex-wrap: nowrap;
+}
+
+.models-model-row > .list-row-main { gap: var(--sp-2); }
+
+.models-provider-head {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+.models-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.models-row-head .soft-tag svg {
+  width: 13px;
+  height: 13px;
+  color: currentColor;
+}
+
+.models-row-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+}
+
+.models-row-actions .MuiButton-root { flex: 0 0 auto; }
+
+.models-key-value {
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta-line.models-installed {
+  flex-wrap: nowrap;
+  gap: var(--sp-2);
+  margin-top: 1px;
+}
+
+.meta-line.models-installed > .meta-item:first-child {
+  flex: 0 1 auto;
+  overflow: hidden;
+}
+
+/* Download progress: themed LinearProgress plus a tabular byte label. */
+.models-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+  padding: var(--sp-3);
+  border-radius: var(--r-sm);
+  background: var(--c-surface-2);
+}
+
+.models-progress-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.models-progress-percent {
+  color: var(--c-ink);
+  font-size: var(--fs-13);
+  font-weight: var(--fw-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.models-progress-bytes {
+  color: var(--c-ink-3);
+  font-size: var(--fs-12);
+  font-variant-numeric: tabular-nums;
+}
+
+.models-delete-button.MuiButton-root { color: var(--c-ink-3); }
+
+.models-delete-button.MuiButton-root:hover {
+  color: var(--c-danger);
+  background: var(--c-danger-soft);
+}
+
+/* Footer note under the local model list. */
+.meta-line.models-panel-note {
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--models-row-pad) var(--sp-4);
+  border-top: 1px solid var(--c-line);
+}
+
+.meta-line.models-panel-note > .status-dot { margin-top: 5px; }
+
+/* ------------------------------ Empty groups ------------------------------ */
+.panel-subtle.models-empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  margin: var(--sp-4) var(--models-row-pad);
+  padding: var(--sp-4);
+  border-radius: var(--r-sm);
+}
+
+.models-empty-title {
+  color: var(--c-ink);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-snug);
+}
+
+/* -------------------------------- Providers ------------------------------- */
+.models-provider-group + .models-provider-group { border-top: 1px solid var(--c-line); }
+
+.models-group-label {
+  padding: var(--sp-4) var(--models-row-pad) 0;
+  color: var(--c-ink-3);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-snug);
+}
+
+.models-provider-logo {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  min-height: 20px;
+  color: var(--c-ink-4);
+}
+
+/* --------------------------- Hardware mismatch tag ------------------------- */
+.soft-tag.models-limit-tag {
+  color: var(--c-warning);
+  background: var(--c-warning-soft);
+}
+
+.soft-tag.models-limit-tag svg {
+  width: 13px;
+  height: 13px;
+  color: currentColor;
+}
+
+/* --------------------------------- Dialogs -------------------------------- */
+.models-dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.models-dialog-head-copy {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.models-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.models-dialog-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.models-dialog-spacer { flex: 1 1 auto; }
+
+.models-dialog-destructive.MuiButton-root { color: var(--c-danger); }
+
+.models-dialog-destructive.MuiButton-outlined {
+  border-color: color-mix(in srgb, var(--c-danger) 34%, var(--c-line-2));
+}
+
+.models-dialog-destructive.MuiButton-root:hover {
+  color: var(--c-danger);
+  border-color: var(--c-danger);
+  background: var(--c-danger-soft);
+}
+
+.models-confirm-target {
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-sm);
+  background: var(--c-surface-2);
+  color: var(--c-ink);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-medium);
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------- Responsive ------------------------------- */
+@container route-content (max-width: 760px) {
+  .models-model-row.list-row,
+  .models-provider-row.list-row { flex-wrap: wrap; }
+
+  .models-model-row > .list-row-end,
+  .models-provider-row > .list-row-end {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    padding-top: var(--sp-1);
+  }
+
+}
+
+@container route-content (max-width: 560px) {
+  .models-page { --models-row-pad: var(--sp-4); }
+
+  .models-toolbar { align-items: flex-start; }
+  .models-mirror-select { min-width: 0; width: 100%; }
+
+  .meta-line.models-storage {
+    flex: 1 1 100%;
+    order: 3;
+  }
+
+  .models-row-actions { justify-content: flex-start; }
+  .models-row-actions .MuiButton-root { flex: 1 1 auto; }
+}
+
+@media (max-width: 560px) {
+  .models-dialog-spacer { display: none; }
+
+  .models-dialog-destructive.MuiButton-root {
+    justify-content: flex-start;
+    width: 100%;
+  }
+}
+
+.models-empty {
+  align-items: flex-start;
+  gap: var(--sp-2);
+  text-align: left;
+}
+
+.models-empty h2 {
+  color: var(--c-ink);
+  font-size: var(--fs-15);
+  font-weight: var(--fw-semibold);
+}
+
+.models-empty p {
+  max-width: 64ch;
+  color: var(--c-ink-3);
+  font-size: var(--fs-13);
+  line-height: var(--lh-normal);
+}

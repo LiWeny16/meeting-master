@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-labelledby="settings-title settings-desc" shape-rendering="geometricPrecision">
+  <title id="settings-title">Meeting Master — audio and provider settings</title>
+  <desc id="settings-desc">A Windows desktop settings concept with endpoint selection, independent source status, complete A2DP to HFP atomic recovery steps, and fail-closed provider configuration details.</desc>
+  <style>
+    text { font-family: 'Microsoft YaHei UI', 'Segoe UI Variable', 'Segoe UI', 'Noto Sans CJK SC', sans-serif; }
+    .primary { fill: #132230; }
+    .body { fill: #263944; }
+    .secondary { fill: #50616C; }
+    .teal { fill: #087F79; }
+    .blue { fill: #194FAF; }
+    .warning { fill: #875500; }
+    .error { fill: #A52D3B; }
+    .note { font-size: 12px; }
+    .label { font-size: 11px; }
+    .status { font-size: 13px; font-weight: 700; }
+  </style>
+
+  <rect width="1440" height="900" fill="#F4F7F8"/>
+  <rect width="1440" height="64" fill="#F9FBFC"/>
+  <path d="M0 63.5H1440" stroke="#D4DEE3"/>
+
+  <rect x="20" y="15" width="34" height="34" rx="10" fill="#173248"/>
+  <path d="M29 40V25l8 9 8-9v15" fill="none" stroke="#F7FAFB" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="26" cy="40" r="2.2" fill="#63D6C5"/><circle cx="48" cy="40" r="2.2" fill="#8CA7FF"/>
+  <text x="68" y="36" class="primary" font-size="15" font-weight="700">Meeting Master</text>
+  <text x="68" y="51" class="secondary label">设置</text>
+  <text x="1114" y="37" class="secondary note">凭据只在后端安全存储</text>
+  <rect x="1288" y="12" width="132" height="40" rx="10" fill="#FFFFFF" stroke="#D4DEE3"/>
+  <path d="M1310 22h16M1310 28h16M1310 34h11" stroke="#50616C" stroke-width="1.6" stroke-linecap="round"/><text x="1336" y="37" class="body status">诊断导出</text>
+
+  <rect y="64" width="204" height="836" fill="#ECF2F4"/>
+  <path d="M203.5 64V900" stroke="#D4DEE3"/>
+  <text x="20" y="98" class="secondary status">设置</text>
+  <rect x="12" y="112" width="180" height="42" rx="9" fill="#DCE8ED"/><rect x="12" y="112" width="3" height="42" rx="1.5" fill="#2D6CDF"/>
+  <path d="M24 124h22M24 130h18M22 118h26v18H22Z" fill="none" stroke="#2D6CDF" stroke-width="1.6" stroke-linecap="round"/><text x="56" y="138" class="primary" font-size="13" font-weight="700">音频设备</text>
+  <path d="M24 176h20M24 182h20M24 188h14" stroke="#50616C" stroke-width="1.6" stroke-linecap="round"/><text x="56" y="189" class="body note">Providers</text>
+  <circle cx="34" cy="234" r="8" fill="none" stroke="#50616C" stroke-width="1.5"/><path d="M34 221v-4M34 251v-4M21 234h-4M51 234h-4" stroke="#50616C" stroke-width="1.5" stroke-linecap="round"/><text x="56" y="241" class="body note">隐私</text>
+  <path d="M25 278h18v13H25ZM28 278v-4a6 6 0 0 1 12 0v4" fill="none" stroke="#50616C" stroke-width="1.5" stroke-linejoin="round"/><text x="56" y="293" class="body note">通用</text>
+  <path d="M20 330H184" stroke="#D2DDE2"/>
+  <text x="20" y="364" class="secondary status">状态摘要</text>
+  <circle cx="26" cy="394" r="5" fill="#087F79"/><text x="40" y="398" class="body note" font-weight="600">系统输出已连接</text><text x="40" y="417" class="secondary label">48 kHz · shared mode</text>
+  <circle cx="26" cy="456" r="5" fill="#B93845"/><text x="40" y="460" class="body note" font-weight="600">麦克风需关注</text><text x="40" y="479" class="error status">permission · 独立来源仍可选</text>
+  <text x="20" y="850" class="secondary label">Windows 桌面版 · 概念稿</text>
+
+  <g transform="translate(232 88)">
+    <text x="0" y="30" class="primary" font-size="27" font-weight="700" letter-spacing="-.02em">音频设备与 Providers</text>
+    <text x="0" y="58" class="secondary note">把采集状态放在控制附近；把 provider 的凭据存在与协议就绪分开说明。</text>
+    <circle cx="1014" cy="24" r="5" fill="#087F79"/><text x="1030" y="29" class="teal status">音频 1 路正常 · 1 路待授权</text>
+  </g>
+
+  <g transform="translate(232 174)">
+    <text x="0" y="24" class="primary" font-size="17" font-weight="700">音频来源</text>
+    <text x="0" y="49" class="secondary label">输出使用 Windows WASAPI loopback；不读取蓝牙 A2DP/HFP 空口数据。</text>
+    <text x="0" y="89" class="secondary status">系统输出 · render endpoint</text>
+    <rect x="0" y="102" width="760" height="58" rx="9" fill="#FFFFFF" stroke="#D4DEE3"/>
+    <circle cx="28" cy="131" r="12" fill="#E4F2F0"/><path d="M20 128h7l7-6v18l-7-6h-7Z" fill="none" stroke="#087F79" stroke-width="1.6" stroke-linejoin="round"/>
+    <text x="52" y="128" class="body status">会议室扬声器</text><text x="52" y="147" class="secondary label">默认设备 · Bluetooth · 48 kHz · Loopback 可用</text><circle cx="708" cy="131" r="5" fill="#087F79"/><text x="720" y="135" class="teal label" font-weight="700">已选择</text>
+    <text x="0" y="196" class="secondary status">麦克风 · input endpoint</text>
+    <rect x="0" y="209" width="760" height="58" rx="9" fill="#FFFFFF" stroke="#D4DEE3"/>
+    <circle cx="28" cy="238" r="12" fill="#E9EEFF"/><rect x="24" y="228" width="8" height="15" rx="4" fill="none" stroke="#2D6CDF" stroke-width="1.5"/><path d="M21 238v2a7 7 0 0 0 14 0v-2M28 248v-5M24 248h8" fill="none" stroke="#2D6CDF" stroke-width="1.5" stroke-linecap="round"/>
+    <text x="52" y="235" class="body status">USB Microphone</text><text x="52" y="254" class="error status">独立输入 · 48 kHz · 权限待确认</text><circle cx="708" cy="238" r="5" fill="#B93845"/><text x="720" y="242" class="error status">待处理</text>
+    <rect x="0" y="306" width="192" height="40" rx="9" fill="#2D6CDF"/><path d="M22 326h16M26 322v8M31 319v14M36 323v6" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/><text x="54" y="331" fill="#FFFFFF" class="status">测试 3 秒电平</text>
+    <text x="216" y="331" class="secondary note">仅在本机显示聚合电平；不上传、不持久化测试音频。</text>
+  </g>
+
+  <g transform="translate(1016 174)">
+    <rect width="404" height="356" rx="14" fill="#FFFFFF" stroke="#D1DDE2"/>
+    <text x="20" y="35" class="primary" font-size="16" font-weight="700">设备行为</text>
+    <path d="M20 58H384" stroke="#D7E0E5"/>
+    <rect x="20" y="78" width="364" height="132" rx="10" fill="#FFF8ED" stroke="#E4C486"/>
+    <circle cx="44" cy="104" r="10" fill="#A56800"/><path d="M44 98v8M44 112v1" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round"/>
+    <text x="68" y="108" class="warning status">蓝牙 profile 可能切换为 HFP</text>
+    <text x="68" y="132" class="secondary label">启用蓝牙耳机麦克风可能降低播放质量</text><text x="68" y="151" class="secondary label">并改变采样率；建议使用独立 USB 麦克风。</text><text x="68" y="183" class="warning status">A2DP 48 kHz → HFP 16 kHz · 需确认</text>
+    <text x="20" y="247" class="body status">安全恢复顺序（原子操作）</text>
+    <text x="20" y="274" class="secondary label">1. 暂停两路 PCM 入队，并标记带起止时间的丢音区间</text>
+    <text x="20" y="296" class="secondary label">2. 停止两条 ASR stream；重枚举并按稳定 ID 重绑</text>
+    <text x="20" y="318" class="secondary label">3. 重建格式转换与时钟锚点，等待两路快照一致</text>
+    <text x="20" y="340" class="warning status">4. 失败回滚旧配置或保持暂停，禁止新旧格式混用</text>
+  </g>
+
+  <g transform="translate(232 580)">
+    <text x="0" y="24" class="primary" font-size="17" font-weight="700">智能能力</text>
+    <text x="0" y="48" class="secondary label">凭据存在不等于 provider 可用；ProtocolUnavailable 时不发送 health、test 或 recheck 请求。</text>
+    <path d="M0 72H1188" stroke="#C9D6DC"/>
+    <text x="0" y="105" class="body status">iFlytek 实时 ASR</text>
+    <text x="220" y="105" class="secondary note">凭据</text><text x="272" y="105" class="teal status">已配置 · 安全存储</text>
+    <text x="520" y="105" class="secondary note">协议</text><text x="568" y="105" class="warning status">ProtocolUnavailable</text><text x="760" y="105" class="warning label">manifest / fixtures 缺失</text>
+    <text x="0" y="132" class="secondary label">配置入口：写入凭据 → 保存并测试（当前停用） · 健康请求：不发送</text>
+    <text x="0" y="154" class="secondary label">能力状态：凭据存在，但实时转写未就绪；不建立网络连接。</text>
+    <path d="M0 178H1188" stroke="#D7E0E5"/>
+
+    <text x="0" y="210" class="body status">MiMo Token Plan</text>
+    <text x="220" y="210" class="secondary note">凭据</text><text x="272" y="210" class="secondary status">未配置 · 不影响本地原文</text>
+    <text x="520" y="210" class="secondary note">协议</text><text x="568" y="210" class="warning status">ProtocolUnavailable</text><text x="760" y="210" class="warning label">golden responses 缺失</text>
+    <text x="0" y="237" class="secondary label">默认 endpoint：token-plan-cn.xiaomimimo.com/v1（锁定） · 模型：待 manifest 验证</text>
+    <text x="0" y="259" class="secondary label">配置入口：写入凭据 → 保存并测试（当前停用） · 会议文本：不发送</text>
+    <path d="M0 284H1188" stroke="#C9D6DC"/>
+    <text x="0" y="314" class="secondary status">测试与重检均禁用；凭据存在、endpoint、model label 和 readiness 永不合并。</text>
+    <text x="0" y="338" class="secondary label">1120×700 contract：音频与设备行为上下堆叠；provider 配置入口仍可达。</text>
+    <text x="0" y="360" class="secondary label">模式静态样本：减少透明度=实色 surface · 减少动效=无 pulse · 高对比=强边框。</text>
+  </g>
+  <text x="232" y="886" class="secondary label">Meeting Master · provisional Apple Design direction; LetShare style not yet verified</text>
+</svg>

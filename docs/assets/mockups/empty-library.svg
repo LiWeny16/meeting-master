@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-labelledby="empty-library-title empty-library-desc" shape-rendering="geometricPrecision">
+  <title id="empty-library-title">Meeting Master — empty library</title>
+  <desc id="empty-library-desc">A calm Windows desktop empty library concept with search, a recoverable recently deleted entry, explicit cloud-processing wording, and a clear first-meeting action.</desc>
+  <style>
+    text { font-family: 'Microsoft YaHei UI', 'Segoe UI Variable', 'Segoe UI', 'Noto Sans CJK SC', sans-serif; }
+    .primary { fill: #132230; }
+    .body { fill: #263944; }
+    .secondary { fill: #50616C; }
+    .blue { fill: #194FAF; }
+    .warning { fill: #875500; }
+    .note { font-size: 12px; }
+    .label { font-size: 11px; }
+    .status { font-size: 13px; font-weight: 700; }
+  </style>
+
+  <rect width="1440" height="900" fill="#F4F7F8"/>
+  <rect width="1440" height="64" fill="#F9FBFC"/>
+  <path d="M0 63.5H1440" stroke="#D4DEE3"/>
+
+  <rect x="20" y="15" width="34" height="34" rx="10" fill="#173248"/>
+  <path d="M29 40V25l8 9 8-9v15" fill="none" stroke="#F7FAFB" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="26" cy="40" r="2.2" fill="#63D6C5"/><circle cx="48" cy="40" r="2.2" fill="#8CA7FF"/>
+  <text x="68" y="36" class="primary" font-size="15" font-weight="700">Meeting Master</text>
+  <text x="68" y="51" class="secondary label">本地优先的会议工作台</text>
+  <text x="1004" y="37" class="secondary note">会话默认保存在本机；云端仅发送已同意的数据</text>
+  <rect x="1284" y="12" width="136" height="40" rx="10" fill="#2D6CDF"/>
+  <path d="M1305 32h14M1312 25v14" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
+  <text x="1330" y="37" fill="#FFFFFF" class="status">新建会议</text>
+
+  <rect y="64" width="204" height="836" fill="#ECF2F4"/>
+  <path d="M203.5 64V900" stroke="#D4DEE3"/>
+  <text x="20" y="98" class="secondary status">工作区</text>
+  <rect x="12" y="112" width="180" height="42" rx="9" fill="#DCE8ED"/>
+  <rect x="12" y="112" width="3" height="42" rx="1.5" fill="#2D6CDF"/>
+  <path d="M29 128h14v13H29ZM32 128v-4h8v4" fill="none" stroke="#2D6CDF" stroke-width="1.7" stroke-linejoin="round"/>
+  <text x="56" y="138" class="primary" font-size="13" font-weight="700">会话库</text>
+  <path d="M30 176v17M21.5 184.5h17" stroke="#50616C" stroke-width="1.8" stroke-linecap="round"/>
+  <text x="56" y="189" class="body note">新建会议</text>
+  <path d="M26 228h20M26 234h14M24 222h24v18H24Z" fill="none" stroke="#50616C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="56" y="237" class="body note">设置</text>
+  <path d="M27 267h18l-3 14H30Z" fill="none" stroke="#50616C" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M29 264h14" stroke="#50616C" stroke-width="1.6" stroke-linecap="round"/>
+  <text x="56" y="278" class="blue note">最近删除 · 可恢复</text>
+  <path d="M20 316H184" stroke="#D2DDE2"/>
+  <text x="20" y="350" class="secondary status">状态</text>
+  <circle cx="26" cy="378" r="5" fill="#875500"/>
+  <text x="40" y="382" class="warning status">设置尚未完成</text>
+  <text x="40" y="402" class="secondary label">可先创建本地记录</text>
+  <path d="M20 820H184" stroke="#D2DDE2"/>
+  <text x="20" y="850" class="secondary label">Windows 桌面版 · 概念稿</text>
+
+  <g transform="translate(236 88)">
+    <text x="0" y="30" class="primary" font-size="27" font-weight="700" letter-spacing="-.02em">会话库</text>
+    <text x="0" y="58" class="secondary note">从一场清晰的会议开始。标题、转写和摘要都可以在本机搜索。</text>
+    <rect x="0" y="86" width="1164" height="50" rx="10" fill="#FFFFFF" stroke="#D4DEE3"/>
+    <circle cx="23" cy="110" r="7" fill="none" stroke="#50616C" stroke-width="1.7"/><path d="m28 115 6 6" stroke="#50616C" stroke-width="1.7" stroke-linecap="round"/>
+    <text x="48" y="115" class="secondary note">搜索标题、转写或行动项</text>
+    <path d="M874 98v24M1012 98v24" stroke="#D4DEE3"/>
+    <text x="900" y="115" class="secondary note">所有时间</text><path d="m980 109 5 5 5-5" fill="none" stroke="#50616C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="1038" y="115" class="blue note" font-weight="700">全部状态</text>
+
+    <g transform="translate(512 224)">
+      <circle cx="70" cy="70" r="70" fill="#E4EEF1"/>
+      <circle cx="70" cy="70" r="47" fill="#FFFFFF" stroke="#B9CCD4" stroke-width="2"/>
+      <path d="M51 84V54c0-7 5-12 12-12s12 5 12 12v30c0 7-5 12-12 12s-12-5-12-12Z" fill="#173248"/>
+      <path d="M39 74v9c0 17 14 31 31 31s31-14 31-31v-9" fill="none" stroke="#2D6CDF" stroke-width="7" stroke-linecap="round"/>
+      <path d="M70 114v17M56 131h28" stroke="#2D6CDF" stroke-width="7" stroke-linecap="round"/>
+      <path d="M28 62v24M112 62v24" stroke="#63D6C5" stroke-width="7" stroke-linecap="round"/>
+    </g>
+    <text x="582" y="484" text-anchor="middle" class="primary" font-size="22" font-weight="700" letter-spacing="-.015em">还没有会议记录</text>
+    <text x="582" y="518" text-anchor="middle" class="body" font-size="14">开始后，系统输出和麦克风会作为两个独立来源进入时间线。</text>
+    <text x="582" y="543" text-anchor="middle" class="secondary note">原始音频默认不保存；启用云端处理时，仅发送已分别同意的音频或文本。</text>
+    <rect x="464" y="574" width="236" height="46" rx="10" fill="#2D6CDF"/>
+    <path d="M494 597h16M502 589v16" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+    <text x="528" y="603" fill="#FFFFFF" class="status">开始第一场会议</text>
+    <text x="582" y="664" text-anchor="middle" class="blue note">先查看隐私与保存策略</text>
+
+    <path d="M0 724H1164" stroke="#D4DEE3"/>
+    <text x="0" y="758" class="primary status">空库也保持可用</text>
+    <text x="0" y="782" class="secondary note">可以先配置设备，或直接创建本地会话草稿；不会因 provider 未就绪而伪装成可用。</text>
+    <text x="0" y="694" class="secondary label">1120×700 contract：侧栏 184px；搜索保留；最近删除仍可达；内容区不横向滚动。</text>
+    <text x="0" y="818" class="secondary label" font-weight="700">模式静态样本：减少透明度=实色 surface · 减少动效=无动画 · 高对比=边框与焦点环</text>
+  </g>
+  <text x="236" y="886" class="secondary label">Meeting Master · provisional Apple Design direction; LetShare style not yet verified</text>
+</svg>

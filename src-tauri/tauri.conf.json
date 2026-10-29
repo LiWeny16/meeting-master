@@ -1,0 +1,65 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Meeting Master",
+  "version": "1.0.0",
+  "identifier": "com.meetingmaster.desktop",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://127.0.0.1:5173",
+    "beforeDevCommand": "node scripts/stage-agent-runtime.mjs --dev && npm run dev",
+    "beforeBuildCommand": "npm run agent:stage && npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Meeting Master",
+        "width": 1366,
+        "height": 860,
+        "minWidth": 1024,
+        "minHeight": 640,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true,
+        "visible": false,
+        "decorations": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' asset: http://asset.localhost data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src ipc: http://ipc.localhost; font-src 'self' data:",
+      "devCsp": "default-src 'self'; img-src 'self' asset: http://asset.localhost data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src ipc: http://ipc.localhost http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src 'self' data:"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "resources": {
+      "../agent-runtime/host.mjs": "agent-runtime/host.mjs",
+      "../agent-runtime/meeting-assistant.md": "agent-runtime/meeting-assistant.md",
+      "../agent-runtime/package.json": "agent-runtime/package.json",
+      "../agent-runtime/package-lock.json": "agent-runtime/package-lock.json",
+      "../agent-runtime/node_modules": "agent-runtime/node_modules",
+      "../agent-runtime/runtime": "agent-runtime/runtime"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEFFOEY4MjVEREM4QjA3MDQKUldRRUI0dmNYWUtQcnUrR01BTEZnQzZta0V0TlhLTi9sdHREZmFWS09POXdNeGpXYTMrM2FURHIK",
+      "endpoints": [
+        "https://github.com/LiWeny16/meeting-master/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}
