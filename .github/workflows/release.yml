@@ -15,6 +15,7 @@ jobs:
     runs-on: windows-latest
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      CARGO_BUILD_JOBS: '2'
       GH_TOKEN: ${{ github.token }}
       RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
     steps:
@@ -28,6 +29,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: npm ci
       - run: npm run tauri:build
+      - run: npm test
       - name: Prepare release metadata
         shell: pwsh
         run: |
