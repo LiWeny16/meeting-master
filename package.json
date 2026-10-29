@@ -1,7 +1,7 @@
 {
   "name": "meeting-master",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
@@ -11,6 +11,7 @@
     "test": "vitest run --maxWorkers=1 && node --test --test-concurrency=1 scripts/cdp-bridge-security.test.mjs scripts/cdp-agent-bridge.test.mjs scripts/agent-deepseek.test.mjs scripts/agent-tool-budget.test.mjs scripts/agent-compaction.test.mjs scripts/agent-eval.test.mjs",
     "agent:eval": "node scripts/agent-eval.mjs",
     "test:watch": "vitest",
+    "test:production-ui": "node scripts/production-ui-smoke.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "tauri:dev": "node scripts/dev-tauri.mjs",
     "tauri:build": "tauri build",
@@ -21,6 +22,7 @@
   "dependencies": {
     "@assistant-ui/core": "^0.3.30",
     "@assistant-ui/react": "^0.15.30",
+    "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@lobehub/icons-static-svg": "1.95.1",

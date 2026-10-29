@@ -1,6 +1,6 @@
 [package]
 name = "meeting-master"
-version = "1.0.0"
+version = "1.0.1"
 description = "Local-first Windows meeting assistant"
 edition = "2024"
 rust-version = "1.90"

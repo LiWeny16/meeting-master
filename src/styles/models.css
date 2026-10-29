@@ -33,7 +33,7 @@
 .meta-line.models-engine-line { gap: var(--sp-2); }
 
 .meta-line.models-engine-line svg,
-.meta-line.models-hardware-line svg {
+.models-hardware-line .meta-line svg {
   width: 15px;
   height: 15px;
 }
