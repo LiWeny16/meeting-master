@@ -43,21 +43,13 @@ export function createUnavailableServices(): AppServices {
       async getStatus() {
         return { status: 'unavailable', label: 'Meeting recording unavailable', detail: 'System sound and microphone diagnostics are available in Settings; the meeting recorder is not connected yet.' };
       },
-      async toggle() { throw unavailable('Audio capture'); },
     },
     transcript: {
       async list() { return []; },
       async search() { return []; },
       async subscribe() { return () => undefined; },
     },
-    knowledge: {
-      async list() { return []; },
-      async search() { return []; },
-      async attach() { throw unavailable('Local knowledge indexing'); },
-      async importUnavailable() {
-        return { status: 'unavailable', message: 'Local document indexing is not connected yet.' };
-      },
-    },
+    knowledge: {},
     identities: {
       async list() { return []; },
       async save() { throw unavailable('Local identity storage'); },

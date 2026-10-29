@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { App } from '../../app/App';
 import { createUnavailableServices } from '../../services/UnavailableServices';
 import type { AgentEvent, AgentProviderSaveInput, AgentRequest, AgentStatus, AppServices } from '../../domain/contracts';
+import { attachAssistantContext } from '../../services/AssistantEvents';
 
 afterEach(() => cleanup());
 beforeEach(() => { window.localStorage.clear(); window.history.replaceState({}, '', '/'); });
@@ -52,6 +53,61 @@ function openModes(input: HTMLElement) {
 }
 
 describe('Meeting Master assistant rail', () => {
+  it('starts a fresh conversation without loading the previous conversation', async () => {
+    const getHistory = vi.fn().mockResolvedValue([{ id: 'old', role: 'user', text: 'Old private message', timestamp: 1 }]);
+    const createConversation = vi.fn().mockResolvedValue({ id: 'new', title: '', createdAt: 2, updatedAt: 2 });
+    const listConversations = vi.fn().mockResolvedValue({ conversations: [{ id: 'old', title: 'Old', createdAt: 1, updatedAt: 1 }], activeConversationId: 'old' });
+    render(<App services={withAgent({ getHistory, createConversation, listConversations })} />);
+    await waitFor(() => expect(createConversation).toHaveBeenCalled());
+    await waitFor(() => expect(screen.getByPlaceholderText('Ask about this meeting')).not.toBeDisabled());
+    expect(getHistory).not.toHaveBeenCalled();
+    expect(screen.queryByText('Old private message')).not.toBeInTheDocument();
+  });
+
+  it('includes a knowledge passage explicitly attached to the assistant', async () => {
+    const send = vi.fn(async (_request: AgentRequest, onEvent: (event: AgentEvent) => void) => { onEvent({ type: 'done' }); });
+    render(<App services={withAgent({ send })} />);
+    await waitFor(() => expect(screen.getByPlaceholderText('Ask about this meeting')).not.toBeDisabled());
+    attachAssistantContext({ text: 'Work / notes.txt\nThe launch is Friday.' });
+    attachAssistantContext({ text: 'Candidate\nExplain experience.' });
+    expect(await screen.findByText(/Work \/ notes.txt/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('link', { name: /^Meeting identities$/ }));
+    expect(await screen.findByText(/Work \/ notes.txt/)).toBeInTheDocument();
+    await ask('What does the source say?');
+    await waitFor(() => expect(send).toHaveBeenCalled());
+    expect(send.mock.calls[0][0].context?.selection).toBe('Work / notes.txt\nThe launch is Friday.\n\nCandidate\nExplain experience.');
+  });
+
+  it('forwards attached image and text file contents to the agent', async () => {
+    const send = vi.fn(async (_request: AgentRequest, onEvent: (event: AgentEvent) => void) => { onEvent({ type: 'done' }); });
+    render(<App services={withAgent({ send })} />);
+    await waitFor(() => expect(screen.getByPlaceholderText('Ask about this meeting')).not.toBeDisabled());
+    const picker = document.querySelector<HTMLInputElement>('input[type="file"]');
+    expect(picker).not.toBeNull();
+    const picture = new File([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])], 'diagram.png', { type: 'image/png' });
+    const notes = new File(['meeting notes'], 'notes.txt', { type: 'text/plain' });
+    fireEvent.change(picker!, { target: { files: [picture, notes] } });
+    expect(await screen.findByText('diagram.png')).toBeInTheDocument();
+    expect(await screen.findByText('notes.txt')).toBeInTheDocument();
+    await ask('Analyze these');
+    await waitFor(() => expect(send).toHaveBeenCalled());
+    expect(send.mock.calls[0][0].attachments).toEqual(expect.arrayContaining([
+      expect.objectContaining({ kind: 'image', name: 'diagram.png', mimeType: 'image/png', data: 'iVBORw0KGgo=' }),
+      expect.objectContaining({ kind: 'text', name: 'notes.txt', data: expect.stringContaining('meeting notes') }),
+    ]));
+  });
+
+  it('clears attached context when starting a new conversation', async () => {
+    let next = 0;
+    const createConversation = vi.fn(async () => ({ id: `new-${++next}`, title: '', createdAt: next, updatedAt: next }));
+    const listConversations = vi.fn().mockResolvedValue({ conversations: [], activeConversationId: null });
+    render(<App services={withAgent({ createConversation, listConversations })} />);
+    await waitFor(() => expect(screen.getByPlaceholderText('Ask about this meeting')).not.toBeDisabled());
+    attachAssistantContext({ text: 'Private source text' });
+    expect(await screen.findByText('Private source text')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'New conversation' }));
+    await waitFor(() => expect(screen.queryByText('Private source text')).not.toBeInTheDocument());
+  });
   it('changes DeepSeek thinking from the composer without replacing the stored API key', async () => {
     const provider = { id: 'deepseek', name: 'DeepSeek', api: 'openai-completions', baseUrl: 'https://api.deepseek.com', configured: true, hasKey: true, thinkingEffort: 'off' as const, models: [] };
     const saveProvider = vi.fn(async (input: AgentProviderSaveInput) => ({ ...provider, thinkingEffort: input.thinkingEffort }));

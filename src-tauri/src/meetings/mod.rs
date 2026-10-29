@@ -38,6 +38,8 @@ pub struct Meeting {
     pub tags: Vec<String>,
     pub participants: u32,
     #[serde(default)]
+    pub identity_id: Option<String>,
+    #[serde(default)]
     pub actions: Vec<MeetingAction>,
 }
 
@@ -72,8 +74,6 @@ pub struct MeetingCreateInput {
     pub agenda: String,
     #[serde(default)]
     pub identity_id: Option<String>,
-    #[serde(default)]
-    pub knowledge_ids: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

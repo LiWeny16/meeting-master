@@ -87,7 +87,12 @@ impl MeetingsState {
     }
 
     pub fn create(&self, input: MeetingCreateInput) -> Result<Meeting, String> {
-        let MeetingCreateInput { title, agenda, .. } = input;
+        let MeetingCreateInput {
+            title,
+            agenda,
+            identity_id,
+            ..
+        } = input;
         let created_at = now_ms();
         let meeting = Meeting {
             id: new_id(created_at),
@@ -103,6 +108,7 @@ impl MeetingsState {
             summary: String::new(),
             tags: Vec::new(),
             participants: 0,
+            identity_id,
             actions: Vec::new(),
         };
         let created = meeting.clone();
@@ -354,13 +360,15 @@ impl MeetingsState {
             None => self.list()?,
         };
         let needle = query.to_lowercase();
+        let terms: Vec<_> = needle.split_whitespace().collect();
         let mut matches = Vec::new();
         for meeting in meetings {
             let Some(directory) = meeting.recording_dir.as_deref() else {
                 continue;
             };
             for segment in TranscriptStore::list(&Path::new(directory).join("transcript.jsonl"))? {
-                if segment.text.to_lowercase().contains(&needle) {
+                let text = segment.text.to_lowercase();
+                if terms.iter().all(|term| text.contains(term)) {
                     matches.push(segment);
                 }
             }
@@ -551,7 +559,6 @@ mod tests {
             title: title.to_string(),
             agenda: agenda.to_string(),
             identity_id: None,
-            knowledge_ids: None,
         }
     }
 
@@ -584,6 +591,22 @@ mod tests {
                 .expect("meeting present")
                 .agenda,
             "Roadmap and blockers"
+        );
+    }
+
+    #[test]
+    fn meeting_identity_survives_restart() {
+        let temp = TempStore::new("identity");
+        let state = MeetingsState::from_path(temp.path()).unwrap();
+        let mut value = input("Interview", "");
+        value.identity_id = Some("candidate".into());
+        let created = state.create(value).unwrap();
+        assert_eq!(created.identity_id.as_deref(), Some("candidate"));
+        drop(state);
+        let reopened = MeetingsState::from_path(temp.path()).unwrap();
+        assert_eq!(
+            reopened.list().unwrap()[0].identity_id.as_deref(),
+            Some("candidate")
         );
     }
 

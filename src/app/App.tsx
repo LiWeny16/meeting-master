@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
-import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
-import { CssBaseline, ThemeProvider } from '@mui/material';
+import { lazy, Suspense, useMemo } from 'react';
+import { BrowserRouter, Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { CircularProgress, CssBaseline, ThemeProvider } from '@mui/material';
 import { AppServicesProvider } from './AppServicesContext';
 import { ThemePreferencesProvider, useThemePreferences } from './ThemePreferencesContext';
 import { AppShell } from '../components/AppShell';
@@ -9,14 +9,6 @@ import { ConfirmProvider } from '../components/feedback/ConfirmProvider';
 import { UpdateProvider } from './UpdateContext';
 import { ToastProvider } from '../components/feedback/ToastProvider';
 import { MeetingsPage } from '../pages/MeetingsPage';
-import { MeetingWorkspaceLayout } from '../pages/MeetingWorkspaceLayout';
-import { NewMeetingPage } from '../pages/NewMeetingPage';
-import { LiveMeetingPage } from '../pages/LiveMeetingPage';
-import { SummaryPage } from '../pages/SummaryPage';
-import { KnowledgePage } from '../pages/KnowledgePage';
-import { IdentitiesPage } from '../pages/IdentitiesPage';
-import { ModelsPage } from '../pages/ModelsPage';
-import { SettingsPage } from '../pages/SettingsPage';
 import { useI18n } from '../i18n/strings';
 import { createNativeServices } from '../services/NativeServices';
 import { createUnavailableServices } from '../services/UnavailableServices';
@@ -31,6 +23,34 @@ import '../styles/scroll.css';
 import '../styles/context-menu.css';
 
 const defaultServices = isNativeTauriRuntime() ? createNativeServices() : createUnavailableServices();
+const MeetingWorkspaceLayout = lazy(() => import('../pages/MeetingWorkspaceLayout').then((module) => ({ default: module.MeetingWorkspaceLayout })));
+const NewMeetingPage = lazy(() => import('../pages/NewMeetingPage').then((module) => ({ default: module.NewMeetingPage })));
+const LiveMeetingPage = lazy(() => import('../pages/LiveMeetingPage').then((module) => ({ default: module.LiveMeetingPage })));
+const SummaryPage = lazy(() => import('../pages/SummaryPage').then((module) => ({ default: module.SummaryPage })));
+const KnowledgePage = lazy(() => import('../pages/KnowledgePage').then((module) => ({ default: module.KnowledgePage })));
+const IdentitiesPage = lazy(() => import('../pages/IdentitiesPage').then((module) => ({ default: module.IdentitiesPage })));
+const ModelsPage = lazy(() => import('../pages/ModelsPage').then((module) => ({ default: module.ModelsPage })));
+const SettingsPage = lazy(() => import('../pages/SettingsPage').then((module) => ({ default: module.SettingsPage })));
+
+function RouteLoading() {
+  const { t } = useI18n();
+  return <div className="loading-panel" role="status"><CircularProgress size={18} /> {t('loading')}</div>;
+}
+
+function LiveMeetingRoute() {
+  const { meetingId } = useParams();
+  return <Suspense fallback={<RouteLoading />}><LiveMeetingPage key={meetingId} /></Suspense>;
+}
+
+function SummaryRoute() {
+  const { meetingId } = useParams();
+  return <Suspense fallback={<RouteLoading />}><SummaryPage key={meetingId} /></Suspense>;
+}
+
+function MeetingWorkspaceRoute() {
+  const { meetingId } = useParams();
+  return <Suspense fallback={<RouteLoading />}><MeetingWorkspaceLayout key={meetingId} /></Suspense>;
+}
 
 function NotFoundPage() {
   const { t } = useI18n();
@@ -50,16 +70,16 @@ function ThemedApplication() {
     <Route element={<AppShell />}>
       <Route path="/" element={<Navigate to="/meetings" replace />} />
       <Route path="/meetings" element={<MeetingsPage />} />
-      <Route path="/meetings/new" element={<NewMeetingPage />} />
-      <Route path="/meetings/:meetingId" element={<MeetingWorkspaceLayout />}>
+      <Route path="/meetings/new" element={<Suspense fallback={<RouteLoading />}><NewMeetingPage /></Suspense>} />
+      <Route path="/meetings/:meetingId" element={<MeetingWorkspaceRoute />}>
         <Route index element={<Navigate to="summary" replace />} />
-        <Route path="live" element={<LiveMeetingPage />} />
-        <Route path="summary" element={<SummaryPage />} />
+        <Route path="live" element={<LiveMeetingRoute />} />
+        <Route path="summary" element={<SummaryRoute />} />
       </Route>
-      <Route path="/knowledge" element={<KnowledgePage />} />
-      <Route path="/identities" element={<IdentitiesPage />} />
-      <Route path="/models" element={<ModelsPage />} />
-      <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/knowledge" element={<Suspense fallback={<RouteLoading />}><KnowledgePage /></Suspense>} />
+      <Route path="/identities" element={<Suspense fallback={<RouteLoading />}><IdentitiesPage /></Suspense>} />
+      <Route path="/models" element={<Suspense fallback={<RouteLoading />}><ModelsPage /></Suspense>} />
+      <Route path="/settings" element={<Suspense fallback={<RouteLoading />}><SettingsPage /></Suspense>} />
       <Route path="*" element={<NotFoundPage />} />
     </Route>
             </Routes></BrowserRouter>

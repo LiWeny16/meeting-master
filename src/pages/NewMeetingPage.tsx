@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowBackOutlined, ArrowForwardOutlined, PlayArrowOutlined, ShieldOutlined } from '@mui/icons-material';
-import { Alert, Button } from '@mui/material';
+import { Alert, Button, MenuItem, TextField } from '@mui/material';
+import type { MeetingIdentity } from '../domain/contracts';
 import { useNavigate } from 'react-router-dom';
 import { useAppServices } from '../app/AppServicesContext';
 import { useI18n } from '../i18n/strings';
@@ -14,6 +15,9 @@ export function NewMeetingPage() {
   const { locale, t } = useI18n();
   const [title, setTitle] = useState('');
   const [agenda, setAgenda] = useState('');
+  const [identities, setIdentities] = useState<MeetingIdentity[]>([]);
+  const [identityId, setIdentityId] = useState('');
+  const [identityError, setIdentityError] = useState('');
   const [audioAvailable, setAudioAvailable] = useState(false);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState('');
@@ -26,6 +30,7 @@ export function NewMeetingPage() {
     }).catch(() => {
       if (alive) setAudioAvailable(false);
     });
+    void services.identities.list().then((items) => { if (alive) setIdentities(items); }).catch((cause: unknown) => { if (alive) setIdentityError(cause instanceof Error ? cause.message : String(cause)); });
     return () => { alive = false; };
   }, [services]);
 
@@ -36,7 +41,7 @@ export function NewMeetingPage() {
     setError('');
     const autoTitle = `${t('autoTitlePrefix')} · ${formatMeetingDate(Date.now(), locale)}`;
     try {
-      const meeting = await services.meetings.create({ title: title.trim() || autoTitle, agenda: agenda.trim() });
+      const meeting = await services.meetings.create({ title: title.trim() || autoTitle, agenda: agenda.trim(), identityId: identityId || undefined });
       await services.meetings.start(meeting.id);
       navigate(`/meetings/${meeting.id}/live`, { state: { meetingLaunch: true } });
     } catch (cause) {
@@ -90,6 +95,13 @@ export function NewMeetingPage() {
               onChange={(event) => setAgenda(event.target.value)}
               placeholder={t('contextPlaceholder')}
             />
+          </div>
+          <div className="field">
+            <TextField select fullWidth size="small" label={locale === 'zh-CN' ? '会议身份（可选）' : 'Meeting identity (optional)'} value={identityId} onChange={(event) => setIdentityId(event.target.value)}>
+              <MenuItem value="">{locale === 'zh-CN' ? '不指定' : 'None'}</MenuItem>
+              {identities.map((identity) => <MenuItem key={identity.id} value={identity.id}>{identity.name} · {identity.role}</MenuItem>)}
+            </TextField>
+            {identityError && <Alert severity="error">{identityError}</Alert>}
           </div>
         </div>
 

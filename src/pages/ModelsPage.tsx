@@ -34,6 +34,7 @@ import {
 import { useI18n } from '../i18n/strings';
 import {
   cancelModelDownload,
+  chooseModelStorage,
   clearProvider,
   deleteLocalModel,
   downloadModel,
@@ -41,6 +42,7 @@ import {
   getLocalSnapshot,
   listProviders,
   onDownloadProgress,
+  probeMirrors,
   saveProvider,
   setActiveAsr,
   testProvider,
@@ -52,11 +54,13 @@ import {
   type DownloadProgress,
   type HardwareProfile,
   type LocalModelInfo,
+  type MirrorLatency,
   type ProviderInfo,
   type ProviderTestResult,
 } from '../services/AsrManagement';
 import { isNativeTauriRuntime } from '../services/TauriRuntime';
 import { ProviderLogo } from '../components/ProviderLogo';
+import { setAssistantPageContext } from '../services/AssistantEvents';
 import '../styles/models.css';
 
 const tierLabelKeys = {
@@ -185,17 +189,16 @@ function ProviderRow({ provider, activating, activationLocked, onConfigure, onAc
         <Button type="button" size="small" variant="outlined" onClick={() => onConfigure(provider)}>
           {provider.configured ? t('manage') : t('configure')}
         </Button>
-        <Button
+        {liveSupported && <Button
           type="button"
           size="small"
           variant="outlined"
-          disabled={provider.active || !provider.configured || activationLocked || !liveSupported}
-          title={liveSupported ? undefined : t('asrLiveUnsupported')}
+          disabled={provider.active || !provider.configured || activationLocked}
           startIcon={activating ? <CircularProgress size={14} color="inherit" /> : undefined}
           onClick={() => onActivate(provider)}
         >
           {t('setActive')}
-        </Button>
+        </Button>}
       </div>
     </li>
   );
@@ -205,8 +208,6 @@ interface ModelRowProps {
   model: LocalModelInfo;
   hardware: HardwareProfile | null;
   active: boolean;
-  pendingActive: boolean;
-  activationLocked: boolean;
   downloadPending: boolean;
   cancelPending: boolean;
   downloadError: string;
@@ -214,15 +215,12 @@ interface ModelRowProps {
   onDownload: (model: LocalModelInfo) => void;
   onCancel: (model: LocalModelInfo) => void;
   onDelete: (model: LocalModelInfo) => void;
-  onActivate: (model: LocalModelInfo) => void;
 }
 
 function ModelRow({
   model,
   hardware,
   active,
-  pendingActive,
-  activationLocked,
   downloadPending,
   cancelPending,
   downloadError,
@@ -230,7 +228,6 @@ function ModelRow({
   onDownload,
   onCancel,
   onDelete,
-  onActivate,
 }: ModelRowProps) {
   const { locale, t } = useI18n();
   const progress = model.progress;
@@ -378,17 +375,6 @@ function ModelRow({
             {t('cancelDownload')}
           </Button>
         )}
-        <Button
-          type="button"
-          size="small"
-          variant="outlined"
-          disabled={!isInstalled || active || activationLocked}
-          title={t('localInferenceUnavailable')}
-          startIcon={pendingActive ? <CircularProgress size={14} color="inherit" /> : undefined}
-          onClick={() => onActivate(model)}
-        >
-          {t('setActive')}
-        </Button>
         {showDelete && (
           <Button
             type="button"
@@ -405,13 +391,19 @@ function ModelRow({
 }
 
 export function ModelsPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [native] = useState(() => isNativeTauriRuntime());
   const mountedRef = useRef(true);
 
   const [hardware, setHardware] = useState<HardwareProfile | null>(null);
   const [providers, setProviders] = useState<ProviderInfo[]>([]);
   const [snapshot, setSnapshot] = useState<AsrLocalSnapshot | null>(null);
+
+  useEffect(() => {
+    const models = snapshot?.models.map((model) => `${model.name}: ${model.status}`).join('; ') ?? 'not loaded';
+    const providerStates = providers.map((provider) => `${provider.name}: ${provider.configured ? 'configured' : 'not configured'}${provider.active ? ', selected' : ''}`).join('; ') || 'not loaded';
+    setAssistantPageContext('/models', `Hardware: ${hardware?.gpuName || 'unknown GPU'}, ${hardware?.cpuName || 'unknown CPU'}; recommended model: ${hardware?.recommendedModelId || 'unknown'}; local models: ${models}; ASR providers: ${providerStates}; local model inference is not connected to live meetings; only the local-websocket ASR provider currently supports live transcription.`);
+  }, [hardware, providers, snapshot]);
 
   const [initialLoading, setInitialLoading] = useState(native);
   const [hardwareLoading, setHardwareLoading] = useState(false);
@@ -430,6 +422,9 @@ export function ModelsPage() {
   const [pendingCancels, setPendingCancels] = useState<Record<string, boolean>>({});
   const [downloadErrors, setDownloadErrors] = useState<Record<string, string>>({});
   const [mirror, setMirror] = useState<AsrDownloadMirror>('hf-mirror');
+  const [mirrorResults, setMirrorResults] = useState<MirrorLatency[] | null>(null);
+  const [mirrorTesting, setMirrorTesting] = useState(false);
+  const [storageChoosing, setStorageChoosing] = useState(false);
 
   const [dialogProviderId, setDialogProviderId] = useState<string | null>(null);
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
@@ -868,6 +863,7 @@ export function ModelsPage() {
               <MenuItem value="hf-mirror">{t('mirrorHf')}</MenuItem>
               <MenuItem value="huggingface">{t('mirrorOfficial')}</MenuItem>
             </Select>
+            <Button size="small" disabled={!native || mirrorTesting} onClick={() => { setMirrorTesting(true); setLocalActionError(null); void probeMirrors().then(setMirrorResults).catch((error: unknown) => setLocalActionError(describeError(error))).finally(() => setMirrorTesting(false)); }}>{mirrorTesting ? (locale === 'zh-CN' ? '测试中…' : 'Testing…') : (locale === 'zh-CN' ? '测试镜像速度' : 'Test mirrors')}</Button>
             <span className="meta-line models-storage">
               <span className="meta-item">
                 <FolderOutlined />
@@ -877,6 +873,7 @@ export function ModelsPage() {
                 </span>
               </span>
             </span>
+            <Button size="small" disabled={!native || storageChoosing} onClick={() => { setStorageChoosing(true); setLocalActionError(null); void chooseModelStorage().then((path) => { if (path) return loadLocal(); }).catch((error: unknown) => setLocalActionError(describeError(error))).finally(() => setStorageChoosing(false)); }}>{locale === 'zh-CN' ? '更改目录' : 'Change folder'}</Button>
             <Tooltip title={t('refresh')}>
               <span className="models-toolbar-end">
                 <IconButton
@@ -891,6 +888,8 @@ export function ModelsPage() {
               </span>
             </Tooltip>
           </div>
+          {snapshot?.configuredStorageDir && snapshot.configuredStorageDir !== snapshot.storageDir && <Alert severity="info">{locale === 'zh-CN' ? '重启后使用所选目录，现有模型不会自动移动。若重启后仍显示此提示，请检查目录是否可访问。所选目录：' : 'Restart to use the selected folder; existing models are not moved. If this notice remains after restarting, check that the folder is accessible. Selected folder: '}{snapshot.configuredStorageDir}</Alert>}
+          {mirrorResults && <p className="panel-caption">{locale === 'zh-CN' ? '小样本测试（含连接时间，实际速度可能不同）：' : 'Small-sample test including connection time; actual speed may differ: '}{mirrorResults.map((result) => `${result.mirror}: ${result.latencyMs === null ? result.message : `${result.latencyMs} ms${result.bytesPerSecond === null ? ` · ${result.message}` : ` · ${formatBytes(result.bytesPerSecond)}/s (${formatBytes(result.sampleBytes)})`}`}`).join(' · ')}</p>}
 
           {snapshot && snapshot.models.length > 0 ? (
             <ul className="row-list models-list">
@@ -902,8 +901,6 @@ export function ModelsPage() {
                     model={model}
                     hardware={hardware}
                     active={active}
-                    pendingActive={pendingActive === `local:${model.id}`}
-                    activationLocked={pendingActive !== null}
                     downloadPending={Boolean(pendingDownloads[model.id])}
                     cancelPending={Boolean(pendingCancels[model.id])}
                     downloadError={downloadErrors[model.id] ?? ''}
@@ -914,7 +911,6 @@ export function ModelsPage() {
                       setDeleteTarget(item);
                       setDeleteError(null);
                     }}
-                    onActivate={(item) => void activateAsr('local', item.id)}
                   />
                 );
               })}

@@ -6,6 +6,23 @@
    ============================================================================= */
 
 /* ------------------------------ Knowledge -------------------------------- */
+.knowledge-source-panel { padding: var(--sp-4); display: grid; gap: var(--sp-4); }
+.knowledge-controls { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; }
+.knowledge-controls .MuiTextField-root { min-width: 180px; flex: 1 1 200px; }
+.knowledge-search { display: flex; gap: var(--sp-3); align-items: center; }
+.knowledge-search button { white-space: nowrap; }
+.knowledge-results { display: grid; gap: var(--sp-3); list-style: none; margin: 0; padding: 0; }
+.knowledge-results li { padding: var(--sp-3); border: 1px solid var(--c-line); border-radius: var(--r-md); }
+.knowledge-results p { margin: var(--sp-2) 0 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--c-ink-2); }
+.knowledge-source-dialog { display: grid; gap: var(--sp-4); padding-top: var(--sp-3) !important; }
+.knowledge-discovery { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.knowledge-document-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+.knowledge-documents ul { list-style: none; padding: 0; margin: 0; }
+.knowledge-documents li { display: flex; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-2) 0; border-bottom: 1px solid var(--c-line); }
+.knowledge-documents li span:first-child { overflow-wrap: anywhere; }
+.knowledge-documents li span:last-child { flex: 0 0 auto; color: var(--c-ink-2); }
+.knowledge-mcp { display: grid; gap: var(--sp-3); }
+.knowledge-json { max-height: 320px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
 /* Local-only data notice: an inline row under the page head, not an alert. */
 .knowledge-note {
   display: flex;

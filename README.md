@@ -4,11 +4,13 @@ Meeting Master is a Windows-first local meeting assistant using Tauri 2, Rust, R
 
 ## Current implementation status
 
-The Windows app records system output and microphone audio into separate local files, stores meetings and finalized transcript segments, and streams audio to a configured real-time ASR adapter. The assistant runs in an app-owned Pi Core runtime with per-meeting conversation history. LLM provider keys are stored by the native host and protected with Windows DPAPI; local OpenAI-compatible endpoints may opt out of authentication. No API key or meeting transcript is bundled.
+The Windows app records system output and microphone audio into separate local files, stores meetings and finalized transcript segments, and streams audio to a configured real-time ASR adapter. The assistant runs in an app-owned Pi Core runtime, starts with a fresh conversation on launch, and keeps earlier conversations available from the history menu. Model history is scoped to the meeting context. LLM and knowledge-service keys are protected with Windows DPAPI; local OpenAI-compatible endpoints may opt out of authentication. No API key or meeting transcript is bundled.
 
 Real-time meeting transcription currently connects only through the **Local WebSocket** adapter. Its default endpoint is ws://192.168.0.200:8092/v1/asr/stream; change it under **Models & ASR** for your machine. Provider setup and connection tests for other ASR services do not connect them to the live stream yet. Downloaded local ASR weights can be managed but are not run for live meetings. A meeting summary is user-triggered from the summary page and is not generated automatically.
 
-Knowledge-file indexing, persisted meeting identities, local downloaded-model inference, and speaker diarization remain unsupported. The interface reports these boundaries rather than suggesting that a configured credential or downloaded model is already producing transcript text. See [the UI and capability contract](docs/product-ui-contract.md) for the current interaction and support map.
+Knowledge can be searched through user-configured RAGFlow, Open WebUI, and AnythingLLM services. RAGFlow also supports file upload and index-status tracking. Streamable HTTP MCP connections expose their declared tools and resources; tools can be invoked manually after confirmation. A local-port check covers common service addresses, while custom URLs remain supported. Data stays with the chosen service. There is no built-in document index, automatic MCP-to-agent tool mapping, or universal MCP discovery.
+
+Meeting identities are stored locally and may be edited or deleted. The assistant supports PNG, JPEG, and WebP images (up to 4 MB each) and text files (up to 256 KB each); image understanding depends on the selected model and provider. PDF and other document formats can be imported into a connected RAGFlow knowledge space. Local downloaded-model inference and speaker diarization remain unsupported. The interface reports these boundaries rather than suggesting that a configured credential or downloaded model is already producing transcript text. See [the UI and capability contract](docs/product-ui-contract.md) for the current interaction and support map.
 
 ## Windows prerequisites
 
@@ -52,9 +54,9 @@ npm run native:check
 ## Product behavior
 
 - **Start meeting** begins local system-output and microphone recording. Real-time transcript text appears only when the Local WebSocket adapter is configured and responding.
-- **Prepare a meeting** stores its title and agenda; it does not schedule a calendar event.
-- Assistant conversations and model selection are scoped to the open meeting. Settings keep LLM providers and speech-recognition providers separate.
-- Model downloads and hardware recommendations are informational in this build. The installer does not include model weights.
+- **Prepare a meeting** stores its title, agenda, and optional identity; it does not schedule a calendar event.
+- The assistant displays the current page, and relevant page state is sent with a message without API keys. Knowledge passages, transcript excerpts, and identities can be attached explicitly. Settings keep LLM providers and speech-recognition providers separate.
+- Model downloads and hardware recommendations are available, but downloaded ASR weights do not yet run in live meetings. Model storage can be changed for the next launch without moving existing files. The installer does not include model weights.
 - Login is deferred. The avatar is a placeholder; the gold PRO badge is a product-tier label, not an authenticated account state.
 - The UI is built on a single token layer (`src/styles/tokens.css`) plus one shared primitive stylesheet (`src/styles.css`). Radii, type sizes, colour, elevation and spacing come only from tokens; the app frame is a neutral canvas holding one content card and one assistant card. Primary action is near-black rather than brand-coloured, and brand colour is limited to state, selection and focus. The full contract — including how a page must be built and reviewed — is in [the UI design system](docs/ui-design-system.md).
 - English and Simplified Chinese preferences, three palettes (Sky Blue, Mint, Graphite), light/dark/system appearance, responsive desktop layout, and reduced-motion-aware micro-interactions are part of the UI foundation.

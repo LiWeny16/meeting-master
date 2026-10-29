@@ -30,7 +30,6 @@ export interface Meeting {
   captureState: string | null;
   captureError: string | null;
   identityId?: string;
-  knowledgeIds?: string[];
   actions?: MeetingAction[];
 }
 
@@ -69,16 +68,6 @@ export interface TranscriptSegment {
   endFrame?: number;
   startedAtMs?: number;
   endedAtMs?: number;
-}
-
-export interface KnowledgeEntry {
-  id: string;
-  title: string;
-  kind: 'document' | 'note' | 'link';
-  updatedAt: string;
-  summary: string;
-  tags: string[];
-  sizeLabel: string;
 }
 
 export interface MeetingIdentity {
@@ -196,21 +185,28 @@ export interface AgentStatus {
 export interface AgentContext {
   mode?: 'catch-up' | 'draft' | 'summary' | 'question' | 'actions';
   page?: string;
+  pageDetails?: string;
   meetingId?: string;
   meetingTitle?: string;
   meetingStatus?: string;
   identityName?: string;
   identityRole?: string;
   identityGoals?: string[];
+  identityContext?: string;
+  identityTone?: string;
+  identityGuardrails?: string;
   transcriptTail?: Array<{ time: string; speaker: string; text: string }>;
   selection?: string;
 }
 
 export interface AgentRequest {
   text: string;
+  attachments?: AgentAttachment[];
   context?: AgentContext;
   conversationId?: string;
 }
+
+export interface AgentAttachment { name: string; kind: 'text' | 'image'; mimeType: string; data: string; }
 
 export interface AgentService {
   getStatus(): Promise<AgentStatus>;
@@ -235,7 +231,7 @@ export interface AgentService {
 export interface MeetingService {
   list(): Promise<Meeting[]>;
   get(id: string): Promise<Meeting | null>;
-  create(input: { title: string; agenda: string; identityId?: string; knowledgeIds?: string[] }): Promise<Meeting>;
+  create(input: { title: string; agenda: string; identityId?: string }): Promise<Meeting>;
   start(id: string): Promise<Meeting>;
   finish(id: string): Promise<Meeting>;
   /** Removes the meeting record and its local recording directory. */
@@ -248,7 +244,6 @@ export interface MeetingService {
 
 export interface AudioService {
   getStatus(): Promise<{ status: CapabilityStatus; label: string; detail: string }>;
-  toggle(): Promise<void>;
   getCaptureState?(): Promise<'idle' | 'starting' | 'recording' | 'stopping' | 'completed' | 'failed'>;
   subscribeCaptureState?(onChange: () => void): Promise<() => void>;
   subscribeLevels?(onLevel: (level: { source: TranscriptSource; rms: number; peak: number }) => void): Promise<() => void>;
@@ -290,15 +285,56 @@ export interface AsrStreamStatusEvent {
 }
 
 export interface KnowledgeService {
-  list(): Promise<KnowledgeEntry[]>;
-  search(query: string): Promise<KnowledgeEntry[]>;
-  attach(ids: string[]): Promise<void>;
-  importUnavailable(): Promise<{ status: 'unavailable'; message: string }>;
+  discoverLocal?(): Promise<Array<{ kind: KnowledgeSource['kind']; baseUrl: string; label: string }>>;
+  listSources?(): Promise<KnowledgeSource[]>;
+  saveSource?(source: KnowledgeSourceInput): Promise<KnowledgeSource>;
+  removeSource?(id: string): Promise<void>;
+  listSpaces?(sourceId: string): Promise<KnowledgeSpace[]>;
+  searchSource?(sourceId: string, spaceId: string, query: string): Promise<KnowledgeResult[]>;
+  inspectMcp?(sourceId: string): Promise<KnowledgeMcpCatalog>;
+  callMcpTool?(sourceId: string, name: string, args: Record<string, unknown>): Promise<unknown>;
+  importFile?(sourceId: string, spaceId: string): Promise<KnowledgeImport | null>;
+  documentStatus?(sourceId: string, spaceId: string, documentId: string): Promise<KnowledgeDocumentStatus>;
+  listDocuments?(sourceId: string, spaceId: string, page: number): Promise<KnowledgeDocumentPage>;
+}
+
+export interface KnowledgeSource {
+  id: string;
+  name: string;
+  kind: 'ragflow' | 'openwebui' | 'anythingllm' | 'mcp';
+  baseUrl: string;
+  hasApiKey: boolean;
+}
+
+export interface KnowledgeSourceInput {
+  id?: string;
+  name: string;
+  kind: KnowledgeSource['kind'];
+  baseUrl: string;
+  apiKey?: string;
+}
+
+export interface KnowledgeSpace { id: string; name: string; }
+export interface KnowledgeImport { name: string; documentId: string; status: string; }
+export interface KnowledgeDocumentStatus { status: 'queued' | 'processing' | 'ready' | 'failed' | 'cancelled' | 'unknown'; message: string; }
+export interface KnowledgeDocumentPage { items: Array<KnowledgeDocumentStatus & { id: string; name: string }>; hasMore: boolean; }
+export interface KnowledgeMcpCatalog {
+  serverName: string;
+  tools: Array<{ name: string; description: string; inputSchema: Record<string, unknown> }>;
+  resources: Array<{ name: string; uri: string }>;
+}
+export interface KnowledgeResult {
+  id: string;
+  documentId: string;
+  documentName: string;
+  content: string;
+  similarity: number | null;
 }
 
 export interface IdentityService {
   list(): Promise<MeetingIdentity[]>;
   save(profile: MeetingIdentity): Promise<void>;
+  remove?(id: string): Promise<void>;
 }
 
 export interface SettingsService {

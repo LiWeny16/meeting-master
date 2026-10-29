@@ -7,6 +7,8 @@ use tauri::Manager;
 pub mod agent;
 pub mod asr;
 pub mod audio;
+pub mod identities;
+pub mod knowledge;
 pub mod meetings;
 pub mod paths;
 
@@ -42,6 +44,7 @@ fn app_runtime_status() -> AppRuntimeStatus {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(
@@ -74,6 +77,11 @@ pub fn run() {
                 .map_err(|error| -> Box<dyn std::error::Error> { error.into() })?;
             app.manage(agent_state);
 
+            let knowledge_state = knowledge::KnowledgeState::new(app.handle())
+                .map_err(|error| -> Box<dyn std::error::Error> { error.into() })?;
+            app.manage(knowledge_state);
+            app.manage(identities::IdentityState::new(data_root));
+
             if let Some(window) = app.get_webview_window("main") {
                 // Windows reports a caption frame offset while the window is hidden,
                 // so sizing before show makes it taller than requested. Show first,
@@ -100,6 +108,20 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             app_runtime_status,
+            knowledge::knowledge_sources_list,
+            knowledge::knowledge_discover_local,
+            knowledge::knowledge_source_save,
+            knowledge::knowledge_source_remove,
+            knowledge::knowledge_spaces_list,
+            knowledge::knowledge_source_search,
+            knowledge::knowledge_mcp_inspect,
+            knowledge::knowledge_mcp_call,
+            knowledge::knowledge_import_file,
+            knowledge::knowledge_document_status,
+            knowledge::knowledge_documents_list,
+            identities::identities_list,
+            identities::identities_save,
+            identities::identities_remove,
             audio::commands::audio_devices_list,
             audio::commands::audio_capture_status,
             audio::commands::asr_stream_statuses,
@@ -119,6 +141,8 @@ pub fn run() {
             meetings::commands::meetings_transcript_search,
             asr::commands::asr_hardware_profile,
             asr::commands::asr_local_models,
+            asr::commands::asr_choose_model_storage,
+            asr::commands::asr_probe_mirrors,
             asr::commands::asr_providers_list,
             asr::commands::asr_provider_save,
             asr::commands::asr_provider_clear,

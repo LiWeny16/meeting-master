@@ -17,8 +17,10 @@ import { RenameMeetingDialog } from '../components/RenameMeetingDialog';
 import { formatMeetingDate, formatMeetingDuration } from '../utils/meetingFormat';
 import '../styles/meeting-workflow.css';
 import { notifyMeetingLaunch } from '../services/MeetingLaunchEvents';
+import { setAssistantPageContext } from '../services/AssistantEvents';
 
 const NO_TRANSCRIPT = 'This meeting has no transcript to export.';
+const MEETINGS_PER_PAGE = 10;
 
 function describeFailure(error: unknown, fallback: string): string {
   if (error instanceof Error && error.message.trim().length > 0) return error.message;
@@ -56,6 +58,9 @@ export function MeetingsPage() {
   const menu = useContextMenu();
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [query, setQuery] = useState('');
+  const [page, setPage] = useState(0);
+  const [transcriptMatches, setTranscriptMatches] = useState<Record<string, string>>({});
+  const [transcriptSearch, setTranscriptSearch] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [audioReady, setAudioReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -81,7 +86,35 @@ export function MeetingsPage() {
     return () => { alive = false; };
   }, [services]);
 
-  const filtered = useMemo(() => meetings.filter((item) => `${item.title} ${item.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase())), [meetings, query]);
+  const filtered = useMemo(() => {
+    const terms = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+    return meetings.filter((item) => {
+      const text = `${item.title} ${item.summary} ${item.tags.join(' ')}`.toLocaleLowerCase();
+      return terms.every((term) => text.includes(term)) || Boolean(transcriptMatches[item.id]);
+    });
+  }, [meetings, query, transcriptMatches]);
+  const pageCount = Math.max(1, Math.ceil(filtered.length / MEETINGS_PER_PAGE));
+  const activePage = Math.min(page, pageCount - 1);
+  const pageMeetings = filtered.slice(activePage * MEETINGS_PER_PAGE, (activePage + 1) * MEETINGS_PER_PAGE);
+
+  useEffect(() => {
+    setAssistantPageContext('/meetings', `Meeting library: ${meetings.length} meetings, ${filtered.length} currently visible matches, page ${activePage + 1} of ${pageCount}; search: ${query.trim() || 'none'}; transcript search status: ${transcriptSearch}.`);
+  }, [meetings.length, filtered.length, activePage, pageCount, query, transcriptSearch]);
+
+  useEffect(() => {
+    const text = query.trim();
+    if (!text) return;
+    let active = true;
+    const timer = window.setTimeout(() => {
+      void services.transcript.search(text).then((segments) => {
+        if (!active) return;
+        const matches: Record<string, string> = {};
+        for (const segment of segments) if (segment.meetingId && !matches[segment.meetingId]) matches[segment.meetingId] = segment.text;
+        setTranscriptMatches(matches); setTranscriptSearch('ready');
+      }).catch(() => { if (active) setTranscriptSearch('error'); });
+    }, 350);
+    return () => { active = false; window.clearTimeout(timer); };
+  }, [query, services.transcript]);
 
   const refreshMeetings = async () => {
     try {
@@ -344,15 +377,15 @@ export function MeetingsPage() {
                   className="library-search-input"
                   type="search"
                   value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder={t('meetingTitle')}
-                  aria-label={t('meetingTitle')}
+                  onChange={(event) => { const value = event.target.value; setQuery(value); setPage(0); setTranscriptMatches({}); setTranscriptSearch(value.trim() ? 'loading' : 'idle'); }}
+                  placeholder={locale === 'zh-CN' ? '搜索会议和对话' : 'Search meetings and transcripts'}
+                  aria-label={locale === 'zh-CN' ? '搜索会议和对话' : 'Search meetings and transcripts'}
                 />
                 {query.length > 0 && (
                   <button
                     type="button"
                     className="library-search-clear"
-                    onClick={() => setQuery('')}
+                    onClick={() => { setQuery(''); setTranscriptMatches({}); setTranscriptSearch('idle'); }}
                     aria-label={t('clearSearch')}
                   >
                     <ClearOutlined aria-hidden="true" />
@@ -363,15 +396,18 @@ export function MeetingsPage() {
           )}
         </div>
 
+        {query.trim() && transcriptSearch === 'loading' && <p className="panel-caption" role="status">{locale === 'zh-CN' ? '正在搜索会议对话…' : 'Searching transcripts…'}</p>}
+        {query.trim() && transcriptSearch === 'error' && <Alert severity="error">{locale === 'zh-CN' ? '会议对话搜索失败，仍显示标题和摘要的匹配结果。' : 'Transcript search failed. Title and summary matches are still shown.'}</Alert>}
+
         {loading ? (
           <div className="loading-panel" role="status">{t('loading')}</div>
-        ) : loadError ? null : filtered.length === 0 ? (
+        ) : loadError ? null : filtered.length === 0 && transcriptSearch === 'loading' ? null : filtered.length === 0 ? (
           <div className="empty-state">
             <h3 id={query ? undefined : EMPTY_HEADING_ID}>{query ? t('noSearchResults') : t('noMeetings')}</h3>
             <p className="panel-caption">{query ? `“${query}”` : t('noMeetingsDetail')}</p>
             <div className="empty-actions">
               {query ? (
-                <Button variant="text" onClick={() => setQuery('')}>{t('backToMeetings')}</Button>
+                <Button variant="text" onClick={() => { setQuery(''); setTranscriptMatches({}); setTranscriptSearch('idle'); }}>{t('backToMeetings')}</Button>
               ) : (
                 <Button
                   id={EMPTY_CTA_ID}
@@ -386,8 +422,9 @@ export function MeetingsPage() {
             </div>
           </div>
         ) : (
+          <>
           <ul className="row-list" ref={listRef} tabIndex={-1}>
-            {filtered.map((meeting) => (
+            {pageMeetings.map((meeting) => (
               <li
                 key={meeting.id}
                 ref={(node) => {
@@ -423,7 +460,7 @@ export function MeetingsPage() {
               >
                 <div className="list-row-main">
                   <span className="list-row-title">{meeting.title}</span>
-                  <span className="list-row-detail">{meeting.summary.trim() || t('summaryUnavailable')}</span>
+                  <span className="list-row-detail">{transcriptMatches[meeting.id] || meeting.summary.trim() || t('summaryUnavailable')}</span>
                   <span className="meta-line">
                     {meeting.endedAt !== null && (
                       <span className="meta-item">
@@ -447,6 +484,12 @@ export function MeetingsPage() {
               </li>
             ))}
           </ul>
+          {pageCount > 1 && <nav className="meeting-pagination" aria-label={locale === 'zh-CN' ? '会议分页' : 'Meeting pages'}>
+            <Button size="small" disabled={activePage === 0} onClick={() => setPage(activePage - 1)}>{locale === 'zh-CN' ? '上一页' : 'Previous'}</Button>
+            <span>{activePage + 1} / {pageCount}</span>
+            <Button size="small" disabled={activePage >= pageCount - 1} onClick={() => setPage(activePage + 1)}>{locale === 'zh-CN' ? '下一页' : 'Next'}</Button>
+          </nav>}
+          </>
         )}
       </section>
       <ContextMenu state={menu.state} onClose={menu.close} />

@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use tauri::State;
 
-use crate::agent::context::ContextInput;
+use crate::agent::context::{AgentAttachment, ContextInput, validate_attachments};
 use crate::agent::state::AgentState;
 use crate::agent::types::{
     AgentConversation, AgentConversationList, AgentHistoryEntry, AgentProviderInfo, AgentSettings,
@@ -124,12 +124,21 @@ pub async fn agent_send(
     text: String,
     context: Option<ContextInput>,
     conversation_id: Option<String>,
+    attachments: Option<Vec<AgentAttachment>>,
 ) -> Result<(), String> {
-    if text.trim().is_empty() {
+    let attachments = attachments.unwrap_or_default();
+    validate_attachments(&attachments)?;
+    if text.trim().is_empty() && attachments.is_empty() {
         return Err("Type a message before sending.".to_string());
     }
     state
-        .run_turn(&text, context, conversation_id, meetings.inner())
+        .run_turn(
+            &text,
+            context,
+            conversation_id,
+            attachments,
+            meetings.inner(),
+        )
         .await
 }
 

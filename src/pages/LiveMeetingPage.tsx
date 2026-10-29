@@ -9,6 +9,7 @@ import { readMeetingView, writeMeetingView } from '../app/meetingViewCache';
 import { formatElapsed } from '../utils/meetingFormat';
 import '../styles/meeting-workflow.css';
 import type { MeetingViewContext } from './MeetingWorkspaceLayout';
+import { attachAssistantContext, ASSISTANT_CONTEXT_MIME } from '../services/AssistantEvents';
 
 function describeError(error: unknown, fallback: string) {
   if (error instanceof Error && error.message.trim()) return error.message;
@@ -53,7 +54,7 @@ function TranscriptPanel({ segments, live, listRef, label }: {
   listRef: React.RefObject<HTMLDivElement | null>;
   label: string;
 }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   return (
     <section className="panel transcript-panel">
       <div className="panel-head">
@@ -78,12 +79,13 @@ function TranscriptPanel({ segments, live, listRef, label }: {
       ) : (
         <div ref={listRef} className="transcript-scroll" role="region" aria-label={label} tabIndex={0}>
           {segments.map((segment) => (
-            <article key={segment.id} id={`transcript-${segment.id}`} className={`transcript-row${segment.stable ? '' : ' is-partial'}`}>
+            <article key={segment.id} id={`transcript-${segment.id}`} className={`transcript-row${segment.stable ? '' : ' is-partial'}`} draggable onDragStart={(event) => { event.dataTransfer.setData(ASSISTANT_CONTEXT_MIME, `${segment.speaker} · ${segment.time}\n${segment.text}`); event.dataTransfer.effectAllowed = 'copy'; }}>
               <div className="transcript-row-head">
                 <span className="soft-tag transcript-speaker">{segment.speaker}</span>
                 <span className="transcript-time">{segment.time}</span>
                 {!segment.stable && <span className="transcript-pending"><span className="transcript-caret" aria-hidden="true" />{t('transcriptRecognizing')}</span>}
                 {segment.stable && <span className="visually-hidden">{t('transcriptFinal')}</span>}
+                <Button size="small" onClick={() => attachAssistantContext({ text: `${segment.speaker} · ${segment.time}\n${segment.text}` })}>{locale === 'zh-CN' ? '加入助手' : 'Add to assistant'}</Button>
               </div>
               <p className="transcript-text">{!segment.stable && segment.agreedPrefix ? <><span className="transcript-agreed-prefix">{segment.agreedPrefix}</span>{segment.text.slice(segment.agreedPrefix.length)}</> : segment.text}</p>
               {segment.translation && <p className="transcript-translation">{segment.translation}</p>}
@@ -138,16 +140,6 @@ export function LiveMeetingPage() {
   useEffect(() => {
     let alive = true;
     let unsubscribe: (() => void) | undefined;
-    const snapshot = readMeetingView(meetingId);
-    setLoading(!snapshot);
-    if (!snapshot) {
-      setMeeting(null);
-      setSegments([]);
-    }
-    setStreamStatus({});
-    setTranscriptError('');
-    setPageError('');
-    setFinishError('');
     followLatestRef.current = true;
     const applyUpdate = (update: TranscriptUpdateEvent) => {
       if (!alive || update.meetingId !== meetingId) return;

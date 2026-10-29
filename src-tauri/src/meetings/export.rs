@@ -232,6 +232,7 @@ mod tests {
             summary: String::new(),
             tags: Vec::new(),
             participants: 0,
+            identity_id: None,
             actions: Vec::new(),
         }
     }

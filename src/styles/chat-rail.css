@@ -717,6 +717,7 @@
   gap: var(--sp-1);
   padding: 10px 10px 0;
 }
+.chat-context-chips:empty { display: none; }
 
 .chat-context-chip {
   max-width: 100%;
@@ -792,6 +793,37 @@
 
 .chat-selection-clear:hover { color: var(--c-ink); background: var(--c-surface-4); }
 .chat-selection-clear svg { width: 14px; height: 14px; }
+
+.chat-attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 3px 6px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  color: var(--c-ink-2);
+  background: var(--c-surface-2);
+  font-size: var(--fs-12);
+  overflow-wrap: anywhere;
+}
+.chat-attachment-chip > svg { width: 15px; height: 15px; flex: 0 0 auto; }
+.chat-attachment-add {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--c-ink-3);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+}
+.chat-attachment-add:hover { color: var(--c-ink); background: var(--c-surface-3); }
+.chat-attachment-add:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.chat-attachment-add:disabled { opacity: .5; cursor: default; }
 
 .chat-rail-input {
   display: block;

@@ -3,7 +3,8 @@ import { listen } from '@tauri-apps/api/event';
 import type {
   AgentConversation, AgentConversationList, AgentEvent, AgentHistoryEntry, AgentModelInfo, AgentProviderInfo, AgentProviderSaveInput,
   AgentProviderTestResult, AgentSettings, AgentStatus, AppServices, AsrStreamStatusEvent,
-  Meeting, ThemePreferences, TranscriptExport, TranscriptSegment, TranscriptUpdateEvent,
+  Meeting, MeetingIdentity, ThemePreferences, TranscriptExport, TranscriptSegment, TranscriptUpdateEvent,
+  KnowledgeSource, KnowledgeSourceInput, KnowledgeSpace, KnowledgeResult, KnowledgeMcpCatalog, KnowledgeImport, KnowledgeDocumentStatus, KnowledgeDocumentPage,
 } from '../domain/contracts';
 import { getCaptureStatus, listAudioDevices, subscribeToAudioEvents, type CaptureSessionState } from './AudioCapture';
 
@@ -23,10 +24,6 @@ function readPreferences(): ThemePreferences {
   } catch {
     return { ...DEFAULT_PREFERENCES };
   }
-}
-
-function unavailable(capability: string): Error {
-  return new Error(`${capability} is not connected in this build.`);
 }
 
 function toNativeError(error: unknown, fallback: string): Error {
@@ -101,8 +98,7 @@ export function createNativeServices(): AppServices {
         return invokeNative<Meeting | null>('meetings_get', { id }, 'This meeting could not be loaded.');
       },
       async create(input) {
-        // The backend stores only the title and agenda for now.
-        return invokeNative<Meeting>('meetings_create', { input: { title: input.title, agenda: input.agenda } }, 'This meeting could not be created.');
+        return invokeNative<Meeting>('meetings_create', { input }, 'This meeting could not be created.');
       },
       async start(id) {
         return invokeNative<Meeting>('meetings_start', { id }, 'Meeting recording could not start.');
@@ -163,9 +159,6 @@ export function createNativeServices(): AppServices {
           return unavailableAudio('Audio devices and capture state could not be read.');
         }
       },
-      async toggle() {
-        throw unavailable('Audio capture');
-      },
     },
     transcript: {
       async list(meetingId) {
@@ -195,16 +188,40 @@ export function createNativeServices(): AppServices {
       },
     },
     knowledge: {
-      async list() { return []; },
-      async search() { return []; },
-      async attach() { throw unavailable('Local knowledge indexing'); },
-      async importUnavailable() {
-        return { status: 'unavailable', message: 'Local document indexing is not connected yet.' };
+      async discoverLocal() { return invokeNative<Array<{ kind: KnowledgeSource['kind']; baseUrl: string; label: string }>>('knowledge_discover_local', undefined, 'Local knowledge services could not be checked.'); },
+      async listSources() {
+        return invokeNative<KnowledgeSource[]>('knowledge_sources_list', undefined, 'Knowledge sources could not be loaded.');
       },
+      async saveSource(input: KnowledgeSourceInput) {
+        return invokeNative<KnowledgeSource>('knowledge_source_save', { input }, 'Knowledge source could not be saved.');
+      },
+      async removeSource(sourceId: string) {
+        await invokeNative<void>('knowledge_source_remove', { sourceId }, 'Knowledge source could not be removed.');
+      },
+      async listSpaces(sourceId: string) {
+        return invokeNative<KnowledgeSpace[]>('knowledge_spaces_list', { sourceId }, 'Knowledge spaces could not be loaded.');
+      },
+      async searchSource(sourceId: string, spaceId: string, query: string) {
+        return invokeNative<KnowledgeResult[]>('knowledge_source_search', { sourceId, spaceId, query }, 'Knowledge search failed.');
+      },
+      async inspectMcp(sourceId: string) {
+        return invokeNative<KnowledgeMcpCatalog>('knowledge_mcp_inspect', { sourceId }, 'MCP service could not be inspected.');
+      },
+      async callMcpTool(sourceId: string, name: string, args: Record<string, unknown>) {
+        return invokeNative<unknown>('knowledge_mcp_call', { sourceId, name, args }, 'MCP tool call failed.');
+      },
+      async importFile(sourceId: string, spaceId: string) {
+        return invokeNative<KnowledgeImport | null>('knowledge_import_file', { sourceId, spaceId }, 'The document could not be imported.');
+      },
+      async documentStatus(sourceId: string, spaceId: string, documentId: string) {
+        return invokeNative<KnowledgeDocumentStatus>('knowledge_document_status', { sourceId, spaceId, documentId }, 'Document status could not be loaded.');
+      },
+      async listDocuments(sourceId: string, spaceId: string, page: number) { return invokeNative<KnowledgeDocumentPage>('knowledge_documents_list', { sourceId, spaceId, page }, 'Documents could not be loaded.'); },
     },
     identities: {
-      async list() { return []; },
-      async save() { throw unavailable('Local identity storage'); },
+      async list() { return invokeNative<MeetingIdentity[]>('identities_list', undefined, 'Identities could not be loaded.'); },
+      async save(profile) { await invokeNative<void>('identities_save', { profile }, 'Identity could not be saved.'); },
+      async remove(id) { await invokeNative<void>('identities_remove', { id }, 'Identity could not be removed.'); },
     },
     agent: {
       async getStatus() {
@@ -276,6 +293,7 @@ export function createNativeServices(): AppServices {
           const args: Record<string, unknown> = { text: request.text };
           if (request.context) args.context = request.context;
           if (request.conversationId) args.conversationId = request.conversationId;
+          if (request.attachments?.length) args.attachments = request.attachments;
           await invoke('agent_send', args);
         } finally {
           signal?.removeEventListener('abort', onAbort);

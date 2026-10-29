@@ -614,6 +614,7 @@ impl AgentState {
         text: &str,
         context: Option<ContextInput>,
         conversation_id: Option<String>,
+        attachments: Vec<context::AgentAttachment>,
         meetings: &MeetingsState,
     ) -> Result<(), String> {
         let _turn_guard = self.turn.lock().await;
@@ -766,14 +767,35 @@ impl AgentState {
                 "maxTokens": model.max_tokens,
             },
         });
-        let prompt = context::build_prompt(text, context.as_ref());
+        let prompt = context::build_prompt(
+            if text.trim().is_empty() {
+                "Please analyze the attached files."
+            } else {
+                text
+            },
+            context.as_ref(),
+        );
+        let display_text = if attachments.is_empty() {
+            text.to_string()
+        } else {
+            format!(
+                "{}\n[{}]",
+                text,
+                attachments
+                    .iter()
+                    .map(|item| item.name.replace(['\r', '\n'], " "))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )
+        };
         let request = json!({
             "type": "prompt",
             "requestId": request_id.clone(),
             "meetingId": meeting_id,
             "profile": profile,
             "text": prompt,
-            "displayText": text,
+            "displayText": display_text,
+            "attachments": attachments,
             "history": stored_conversation.messages_for_context(meeting_id.as_deref()),
             "visibleHistory": stored_conversation.visible_history,
         });
@@ -2254,7 +2276,6 @@ mod tests {
                 title: "fixture".to_string(),
                 agenda,
                 identity_id: None,
-                knowledge_ids: None,
             })
             .unwrap();
         (store, meeting.id)

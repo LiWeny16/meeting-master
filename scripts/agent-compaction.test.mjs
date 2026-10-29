@@ -82,6 +82,19 @@ test('failed summary refuses to silently discard old turns', { timeout: 20000 },
   assert.deepEqual(result.saved.filter((m) => m.role !== 'system').slice(0, longHistory.length), longHistory);
 });
 
+test('compaction summarizes past image attachments without embedding their base64 in text', { timeout: 20000 }, async () => {
+  const history = structuredClone(longHistory);
+  const encoded = 'QUJD'.repeat(10000);
+  history[0].content.push({ type: 'image', mimeType: 'image/png', data: encoded });
+  const result = await turn({ history });
+  assert.equal(result.error, undefined);
+  const summary = result.requests.find((request) => request.messages.some((message) => message.role === 'system' && String(message.content).includes('Summarize prior conversation')));
+  assert.ok(summary);
+  const body = JSON.stringify(summary);
+  assert.ok(body.includes('Image attachment was present'));
+  assert.ok(!body.includes(encoded));
+});
+
 test('oversized current turn produces a clear failure rather than partial tool history', { timeout: 20000 }, async () => {
   const result = await turn({ history: [], text: '太长'.repeat(5000) });
   assert.match(result.error, /current turn|context window/i);

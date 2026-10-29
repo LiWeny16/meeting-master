@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   AddCommentRounded,
   AddRounded,
   ArrowUpwardRounded,
+  AttachFileRounded,
   CheckRounded,
   ChatBubbleOutlineRounded,
   ChevronRightRounded,
@@ -31,7 +32,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { ActionBarPrimitive, AuiIf, AssistantRuntimeProvider, ComposerPrimitive, MessagePrimitive, ThreadPrimitive } from '@assistant-ui/react';
+import { ActionBarPrimitive, AuiIf, AssistantRuntimeProvider, AttachmentPrimitive, ComposerPrimitive, MessagePrimitive, ThreadPrimitive } from '@assistant-ui/react';
 import type { TextMessagePartProps } from '@assistant-ui/core/react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppServices } from '../app/AppServicesContext';
@@ -47,7 +48,7 @@ import type {
   AppServices,
 } from '../domain/contracts';
 import { isTranslatedMessage, useI18n, type MessageKey } from '../i18n/strings';
-import { AGENT_SETTINGS_CHANGED_EVENT, ASSISTANT_COMPOSE_EVENT, type AssistantComposeEventDetail } from '../services/AssistantEvents';
+import { AGENT_SETTINGS_CHANGED_EVENT, ASSISTANT_COMPOSE_EVENT, ASSISTANT_CONTEXT_EVENT, ASSISTANT_CONTEXT_MIME, getAssistantPageContext, type AssistantComposeEventDetail, type AssistantContextDetail } from '../services/AssistantEvents';
 import { AgentActivity, AgentPermissionPart, AgentSourcePart, AgentTextPart } from './chat/AgentParts';
 import { CONTEXT_STATUS_PART_NAME, PERMISSION_PART_NAME, useAgentRuntime } from './chat/agentRuntime';
 import { ProviderLogo } from './ProviderLogo';
@@ -174,7 +175,9 @@ function commandTokenAtCursor(value: string, cursor: number): { start: number; e
 }
 
 export function ChatRail() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const translationRef = useRef(t);
+  useEffect(() => { translationRef.current = t; }, [t]);
   const { preferences, setChatPanel } = useThemePreferences();
   const services = useAppServices();
   const location = useLocation();
@@ -196,10 +199,11 @@ export function ChatRail() {
   const [conversations, setConversations] = useState<AgentConversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [historyMenuAnchor, setHistoryMenuAnchor] = useState<HTMLElement | null>(null);
-  const [meetingTitle, setMeetingTitle] = useState('');
+  const [meetingTitle, setMeetingTitle] = useState<{ id: string; title: string } | null>(null);
   const [includeSelection, setIncludeSelection] = useState(false);
   const [selectedText, setSelectedText] = useState('');
   const [selectedTextTruncated, setSelectedTextTruncated] = useState(false);
+  const [attachedContexts, setAttachedContexts] = useState<Array<{ id: string; text: string; truncated: boolean }>>([]);
   const [contextMenuAnchor, setContextMenuAnchor] = useState<HTMLElement | null>(null);
   const [commandPickerAnchor, setCommandPickerAnchor] = useState<HTMLTextAreaElement | null>(null);
   const [commandPickerOpen, setCommandPickerOpen] = useState(false);
@@ -209,16 +213,40 @@ export function ChatRail() {
   const pendingModeRef = useRef<AssistantMode | null>(null);
   const includeSelectionRef = useRef(false);
   const selectedTextRef = useRef('');
+  const attachedContextsRef = useRef<Array<{ id: string; text: string; truncated: boolean }>>([]);
   const buildContextRef = useRef<(() => Promise<AgentContext>) | undefined>(undefined);
   const conversationSelectionRef = useRef<{ scopeKey: string; id: string | null }>({ scopeKey: THREAD_SCOPE, id: null });
   const commandRangeRef = useRef<{ start: number; end: number } | null>(null);
   const pendingComposeRef = useRef<AssistantComposeEventDetail | null>(null);
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
   const currentScopeKey = THREAD_SCOPE;
-  const isScopeReady = conversationSelectionRef.current.scopeKey === currentScopeKey;
+  const isScopeReady = true; // The assistant uses a single, global scope.
   const isHistoryLoading = historyLoading || !isScopeReady;
   const focusComposer = useCallback(() => {
     window.requestAnimationFrame(() => document.querySelector<HTMLTextAreaElement>('.chat-rail-input')?.focus());
   }, []);
+
+  const attachContext = useCallback((text: string) => {
+    const chars = Array.from(text.trim());
+    if (!chars.length) return;
+    const excerpt = chars.slice(0, MAX_SELECTED_TEXT_CHARS).join('').trimEnd();
+    if (attachedContextsRef.current.some((item) => item.text === excerpt)) { setChatPanel('expanded'); focusComposer(); return; }
+    if (attachedContextsRef.current.length >= 5) { setStatusError(locale === 'zh-CN' ? '最多添加 5 段上下文，请先移除不需要的内容。' : 'Add up to five context items; remove one first.'); return; }
+    const next = [...attachedContextsRef.current, { id: crypto.randomUUID(), text: excerpt, truncated: chars.length > MAX_SELECTED_TEXT_CHARS }];
+    attachedContextsRef.current = next;
+    setAttachedContexts(next);
+    setChatPanel('expanded');
+    focusComposer();
+  }, [focusComposer, locale, setChatPanel]);
+
+  useEffect(() => {
+    const onContext = (event: Event) => {
+      const detail = (event as CustomEvent<AssistantContextDetail>).detail;
+      if (typeof detail?.text === 'string') attachContext(detail.text);
+    };
+    window.addEventListener(ASSISTANT_CONTEXT_EVENT, onContext);
+    return () => window.removeEventListener(ASSISTANT_CONTEXT_EVENT, onContext);
+  }, [attachContext]);
 
   const agentServices = useMemo<AppServices>(() => ({
     ...services,
@@ -270,6 +298,14 @@ export function ChatRail() {
   }), [meetingId, services, t]);
 
   const runtime = useAgentRuntime(agentServices);
+  const addFiles = async (files: FileList | File[]) => {
+    setStatusError('');
+    try {
+      const incoming = Array.from(files);
+      if (runtime.thread.composer.getState().attachments.length + incoming.length > 8) throw new Error(locale === 'zh-CN' ? '一次最多添加 8 个附件。' : 'Add no more than eight attachments.');
+      for (const file of incoming) await runtime.thread.composer.addAttachment(file);
+    } catch (error) { setStatusError(readError(error, locale === 'zh-CN' ? '无法添加附件。' : 'Could not add attachment.')); }
+  };
   const statusKind = agentStatus?.status ?? null;
   const canAsk = agentStatus?.status === 'available';
 
@@ -351,17 +387,11 @@ export function ChatRail() {
   }, [services.agent, statusKind, t]);
 
   useEffect(() => {
-    setIncludeSelection(false);
-    includeSelectionRef.current = false;
-    selectedTextRef.current = '';
-    setSelectedText('');
-    setSelectedTextTruncated(false);
-    setMeetingTitle('');
     if (!meetingId) return;
     let active = true;
     void services.meetings.get(meetingId)
       .then((meeting) => {
-        if (active) setMeetingTitle(meeting?.title ?? '');
+        if (active) setMeetingTitle({ id: meetingId, title: meeting?.title ?? '' });
       })
       .catch((error: unknown) => {
         if (active) setStatusError(readError(error, t('assistantContextFailed')));
@@ -416,9 +446,10 @@ export function ChatRail() {
 
   const buildContext = useCallback(async (): Promise<AgentContext> => {
     const context: AgentContext = { page: location.pathname };
-    if (includeSelectionRef.current && selectedTextRef.current.trim()) {
-      context.selection = selectedTextRef.current.trim();
-    }
+    const pageDetails = getAssistantPageContext(location.pathname);
+    if (pageDetails) context.pageDetails = pageDetails;
+    const selections = [includeSelectionRef.current ? selectedTextRef.current.trim() : '', ...attachedContextsRef.current.map((item) => item.text)].filter(Boolean);
+    if (selections.length) context.selection = selections.join('\n\n');
     if (!meetingId) return context;
 
     const meeting = await services.meetings.get(meetingId);
@@ -434,35 +465,41 @@ export function ChatRail() {
         context.identityName = identity.name;
         context.identityRole = identity.role;
         context.identityGoals = identity.goals;
+        context.identityContext = identity.context;
+        context.identityTone = identity.tone;
+        context.identityGuardrails = identity.guardrails;
       }
     }
     return context;
   }, [location.pathname, meetingId, services.meetings, services.identities, t]);
-  buildContextRef.current = buildContext;
+  useLayoutEffect(() => { buildContextRef.current = buildContext; }, [buildContext]);
 
   useEffect(() => {
     let active = true;
-    setHistoryError('');
-    setHistoryLoading(true);
     if (!threadReady) return () => { active = false; };
-
-    // The provider has attached the local thread runtime before we mutate it.
-    runtime.thread.reset([]);
     const scopeKey = THREAD_SCOPE;
-    conversationSelectionRef.current = { scopeKey, id: null };
-    setHistoryMenuAnchor(null);
-    setContextMenuAnchor(null);
-    setCommandPickerOpen(false);
-    setCommandPickerAnchor(null);
-    setConversations([]);
-    setActiveConversationId(null);
     void (async () => {
+      await Promise.resolve();
+      if (!active) return;
+      setHistoryError('');
+      setHistoryLoading(true);
+      // The provider has attached the local thread runtime before we mutate it.
+      runtime.thread.reset([]);
+      conversationSelectionRef.current = { scopeKey, id: null };
+      setHistoryMenuAnchor(null);
+      setContextMenuAnchor(null);
+      setCommandPickerOpen(false);
+      setCommandPickerAnchor(null);
+      setConversations([]);
+      setActiveConversationId(null);
       let list = services.agent.listConversations
         ? await services.agent.listConversations(scopeKey)
         : { conversations: [], activeConversationId: null };
-      if (list.conversations.length === 0 && services.agent.createConversation) {
+      // A fresh launch starts at the welcome screen; older conversations remain
+      // available through the history menu and are loaded only when selected.
+      if (services.agent.createConversation) {
         const created = await services.agent.createConversation(scopeKey);
-        list = { conversations: [created], activeConversationId: created.id };
+        list = { conversations: [created, ...list.conversations.filter((item) => item.id !== created.id)], activeConversationId: created.id };
       }
       if (!services.agent.listConversations) {
         list = {
@@ -476,22 +513,21 @@ export function ChatRail() {
       if (selectedId && services.agent.selectConversation && selectedId !== list.activeConversationId) {
         await services.agent.selectConversation(scopeKey, selectedId);
       }
-      const history = await services.agent.getHistory(scopeKey, services.agent.listConversations ? selectedId ?? undefined : undefined);
       if (!active) return;
       conversationSelectionRef.current = { scopeKey, id: selectedId };
       setConversations(list.conversations);
       setActiveConversationId(selectedId);
-      runtime.thread.reset(toThreadMessages(history));
+      runtime.thread.reset([]);
     })()
       .catch((error: unknown) => {
         if (!active) return;
         runtime.thread.reset([]);
-        setHistoryError(readError(error, t('assistantHistoryFailed')));
+        setHistoryError(readError(error, translationRef.current('assistantHistoryFailed')));
       })
       .finally(() => { if (active) setHistoryLoading(false); });
     return () => { active = false; };
     // Deliberately NOT keyed on the route: navigating must not reload the thread.
-  }, [runtime, services.agent, t, threadReady]);
+  }, [runtime, services.agent, threadReady]);
 
   useEffect(() => {
     const onCompose = (event: Event) => {
@@ -593,9 +629,9 @@ export function ChatRail() {
     const input = document.querySelector<HTMLTextAreaElement>('.chat-rail-input');
     const text = input?.value.trim() ?? '';
     pendingModeRef.current = selectedMode.id;
-    runtime.thread.composer.setText('');
+    runtime.thread.composer.setText(`@${t(selectedMode.labelKey)}${text ? `\n${text}` : ''}`);
     setSelectedMode(null);
-    runtime.thread.append(`@${t(selectedMode.labelKey)}${text ? `\n${text}` : ''}`);
+    runtime.thread.composer.send();
   };
 
   const handleNewConversation = async () => {
@@ -610,6 +646,9 @@ export function ChatRail() {
       conversationSelectionRef.current = { scopeKey, id: conversation.id };
       setConversations((current) => [conversation, ...current.filter((item) => item.id !== conversation.id)]);
       setActiveConversationId(conversation.id);
+      attachedContextsRef.current = []; setAttachedContexts([]);
+      includeSelectionRef.current = false; setIncludeSelection(false);
+      selectedTextRef.current = ''; setSelectedText(''); setSelectedTextTruncated(false);
       runtime.thread.reset([]);
     } catch (error) {
       setHistoryError(readError(error, t('assistantHistoryFailed')));
@@ -732,7 +771,15 @@ export function ChatRail() {
   };
 
   const activeConversation = isScopeReady ? conversations.find((item) => item.id === activeConversationId) : undefined;
-  const currentMeetingTitle = isScopeReady ? meetingTitle : '';
+  const currentMeetingTitle = isScopeReady && meetingTitle && meetingTitle.id === meetingId ? meetingTitle.title : '';
+  const pageName = location.pathname === '/meetings/new' ? (locale === 'zh-CN' ? '准备会议' : 'Prepare meeting')
+    : location.pathname.startsWith('/meetings/') ? (location.pathname.endsWith('/live') ? (locale === 'zh-CN' ? '会议转写' : 'Transcript') : (locale === 'zh-CN' ? '会议纪要' : 'Meeting summary'))
+      : location.pathname.startsWith('/models') ? (locale === 'zh-CN' ? '模型与 ASR' : 'Models and ASR')
+        : location.pathname.startsWith('/knowledge') ? (locale === 'zh-CN' ? '知识库' : 'Knowledge')
+          : location.pathname.startsWith('/identities') ? (locale === 'zh-CN' ? '会议身份' : 'Identities')
+            : location.pathname.startsWith('/settings') ? (locale === 'zh-CN' ? '设置' : 'Settings')
+              : (locale === 'zh-CN' ? '会议' : 'Meetings');
+  const generalSuggestions = locale === 'zh-CN' ? ['如何选择转写模型？', '如何配置 AI 后端？', '帮我准备一场会议'] : ['How do I choose a transcription model?', 'How do I configure an AI backend?', 'Help me prepare for a meeting'];
 
   return (
     <>
@@ -775,7 +822,7 @@ export function ChatRail() {
               >
                 <span className={`status-dot ${currentMeetingTitle ? 'is-ready' : 'is-idle'}`} aria-hidden="true" />
                 <span className="chat-context-strip-copy">
-                  <span className="chat-context-strip-label">{t(meetingId ? 'assistantCurrentMeeting' : 'assistantGeneralContext')}</span>
+                  <span className="chat-context-strip-label">{locale === 'zh-CN' ? `当前页面：${pageName}` : `Current page: ${pageName}`}</span>
                   <span className="chat-context-strip-title" title={currentMeetingTitle || undefined}>
                     {currentMeetingTitle || (meetingId ? t('assistantLoadingMeeting') : t('assistantNoMeetingAttached'))}
                   </span>
@@ -820,7 +867,7 @@ export function ChatRail() {
                 turnAnchor="top"
                 topAnchorMessageClamp={{ tallerThan: '10em', visibleHeight: '6em' }}
               >
-                {statusError && <Alert severity="error" className="chat-rail-alert">{statusError}</Alert>}
+                {statusError && <Alert severity="error" className="chat-rail-alert" onClose={() => setStatusError('')}>{statusError}</Alert>}
                 {isScopeReady && historyError && <Alert severity="error" className="chat-rail-alert">{historyError}</Alert>}
                 {modelError && <Alert severity="error" className="chat-rail-alert">{modelError}</Alert>}
 
@@ -860,6 +907,9 @@ export function ChatRail() {
                           ))}
                         </div>
                       )}
+                      {!meetingId && <div className="chat-rail-suggestions" aria-label={t('assistantSuggestions')}>
+                        {generalSuggestions.map((suggestion) => <Button key={suggestion} className="chat-rail-suggestion" disabled={!threadReady || isHistoryLoading} onClick={() => { runtime.thread.composer.setText(suggestion); focusComposer(); }}>{suggestion}</Button>)}
+                      </div>}
                     </div>
                   )}
                 </AuiIf>
@@ -873,6 +923,7 @@ export function ChatRail() {
                       return (
                       <MessagePrimitive.Root className={`chat-message chat-message-${message.role}`}>
                         {message.role === 'assistant' && <AgentActivity message={message} />}
+                        {message.role === 'user' && <MessagePrimitive.Attachments>{({ attachment }) => <span className="chat-attachment-chip" title={attachment.name}><AttachFileRounded />{attachment.name}</span>}</MessagePrimitive.Attachments>}
                         <MessagePrimitive.Parts
                           components={{
                             Text: message.role === 'user' ? UserTextPart : AgentTextPart,
@@ -912,8 +963,15 @@ export function ChatRail() {
                 </Box>}
 
                 <ThreadPrimitive.ViewportFooter className="chat-thread-footer">
-                  <ComposerPrimitive.Root className="chat-composer-shell">
-                    {(meetingId || includeSelection || selectedMode) && (
+                  <ComposerPrimitive.Root className="chat-composer-shell" onDragOver={(event) => {
+                    if (Array.from(event.dataTransfer.types).some((type) => type === ASSISTANT_CONTEXT_MIME || type === 'Files')) event.preventDefault();
+                  }} onDrop={(event) => {
+                    const text = event.dataTransfer.getData(ASSISTANT_CONTEXT_MIME);
+                    if (text) { event.preventDefault(); attachContext(text); }
+                    else if (event.dataTransfer.files.length) { event.preventDefault(); void addFiles(event.dataTransfer.files); }
+                  }}>
+                    <div className="chat-context-chips"><ComposerPrimitive.Attachments>{({ attachment }) => <AttachmentPrimitive.Root className="chat-attachment-chip" title={attachment.name}><AttachFileRounded /><AttachmentPrimitive.Name /><AttachmentPrimitive.Remove aria-label={locale === 'zh-CN' ? `移除 ${attachment.name}` : `Remove ${attachment.name}`} className="chat-selection-clear"><CloseRounded /></AttachmentPrimitive.Remove></AttachmentPrimitive.Root>}</ComposerPrimitive.Attachments></div>
+                    {(meetingId || includeSelection || selectedMode || attachedContexts.length > 0) && (
                       <div className="chat-context-chips">
                         {meetingId ? (
                           <span className="soft-tag chat-context-chip" title={currentMeetingTitle || undefined}>
@@ -921,6 +979,7 @@ export function ChatRail() {
                           </span>
                         ) : null}
                         {selectedMode && <span className="chat-mode-tag chat-mode-tag-editable">@{t(selectedMode.labelKey)}<button type="button" className="chat-mode-remove" onClick={() => { setSelectedMode(null); focusComposer(); }} aria-label={t('assistantRemoveMode')} title={t('assistantRemoveMode')}><CloseRounded /></button></span>}
+                        {attachedContexts.map((item) => <span key={item.id} className="chat-selection-chip"><span className="chat-selection-quote" title={item.text}>{item.text}</span>{item.truncated && <span className="chat-selection-truncated">{t('assistantSelectionTruncated')}</span>}<button type="button" className="chat-selection-clear" aria-label={locale === 'zh-CN' ? '移除上下文' : 'Remove context'} onClick={() => { const next = attachedContextsRef.current.filter((value) => value.id !== item.id); attachedContextsRef.current = next; setAttachedContexts(next); }}><CloseRounded /></button></span>)}
                         {includeSelection ? (
                           <span className="chat-selection-chip" aria-label={`${t('assistantSelectionAttached')}${selectedTextTruncated ? `, ${t('assistantSelectionTruncated')}` : ''}`}>
                             <span aria-hidden="true">@</span>
@@ -956,6 +1015,8 @@ export function ChatRail() {
                     />
                     <div className="chat-composer-footer">
                       <div className="chat-composer-tools">
+                      <input ref={attachmentInputRef} hidden type="file" multiple accept="image/png,image/jpeg,image/webp,text/plain,text/html,text/markdown,text/csv,text/xml,text/json,application/json,text/css,.txt,.md,.csv,.json,.xml,.css,.html" onChange={(event) => { if (event.currentTarget.files) void addFiles(event.currentTarget.files); event.currentTarget.value = ''; }} />
+                      <Tooltip title={locale === 'zh-CN' ? '添加图片或文本文件' : 'Add image or text file'}><span><button type="button" onClick={() => attachmentInputRef.current?.click()} className="chat-attachment-add" aria-label={locale === 'zh-CN' ? '添加图片或文本文件' : 'Add image or text file'} disabled={!threadReady || isHistoryLoading || threadRunning}><AttachFileRounded /></button></span></Tooltip>
                       <Tooltip title={t('assistantAddContext')}>
                         <IconButton
                           className="chat-context-button"
@@ -1069,6 +1130,7 @@ export function ChatRail() {
                       <Typography className="chat-context-explanation-title">{t(meetingId ? 'assistantCurrentMeeting' : 'assistantGeneralContext')}</Typography>
                       {currentMeetingTitle && <Typography className="chat-context-description">{currentMeetingTitle}</Typography>}
                       <Typography className="chat-context-description">{t(meetingId ? 'assistantCurrentMeetingDetail' : 'assistantGeneralContextDetail')}</Typography>
+                      {getAssistantPageContext(location.pathname) && <Typography className="chat-context-description">{locale === 'zh-CN' ? '当前页面的选择和状态会随消息发送；不包含 API 密钥。' : 'The current page selection and status are sent with your message; API keys are excluded.'}</Typography>}
                       {meetingId && <Typography className="chat-context-description">{t('assistantTranscriptAccess')}</Typography>}
                       <Typography className="chat-context-description">{t('assistantHistoryLimit')}</Typography>
                       <Typography className="chat-context-description">{t(includeSelection ? 'assistantSelectionIncluded' : 'assistantSelectionOptional')}</Typography>

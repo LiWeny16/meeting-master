@@ -6,9 +6,22 @@
     <meta name="theme-color" content="#f5f8fb" />
     <meta name="description" content="Meeting Master — a local-first meeting workspace." />
     <title>Meeting Master</title>
+    <style>
+      .startup-screen { position: fixed; inset: 0; display: grid; place-content: center; justify-items: center; gap: 18px; background: #f1f2f5; color: #202126; font: 600 20px system-ui, sans-serif; }
+      .startup-mark { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 14px; background: #111113; color: white; font-size: 22px; }
+      .startup-dots { display: flex; gap: 6px; }
+      .startup-dots span { width: 6px; height: 6px; border-radius: 50%; background: #8c8f98; animation: startup-pulse 1.2s ease-in-out infinite; }
+      .startup-dots span:nth-child(2) { animation-delay: .15s; }
+      .startup-dots span:nth-child(3) { animation-delay: .3s; }
+      .startup-slow { margin: 0; opacity: 0; max-width: 35ch; text-align: center; font-size: 13px; font-weight: 400; animation: startup-note 1ms 12s forwards; }
+      @keyframes startup-pulse { 0%, 70%, 100% { opacity: .3; } 35% { opacity: 1; } }
+      @keyframes startup-note { to { opacity: 1; } }
+      @media (prefers-color-scheme: dark) { .startup-screen { background: #1a1b1f; color: #f4f4f6; } .startup-mark { background: #f4f4f6; color: #111113; } }
+      @media (prefers-reduced-motion: reduce) { .startup-dots span { animation: none; } }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="startup-screen" role="status" aria-label="Loading Meeting Master"><span class="startup-mark" aria-hidden="true">M</span><span>Meeting Master</span><div class="startup-dots" aria-hidden="true"><span></span><span></span><span></span></div><p class="startup-slow">启动时间较长，请稍候；如持续无法打开，请重新启动应用。</p></div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

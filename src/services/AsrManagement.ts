@@ -82,6 +82,15 @@ export interface AsrLocalSnapshot {
   models: LocalModelInfo[];
   active: AsrSelection;
   storageDir: string;
+  configuredStorageDir?: string | null;
+}
+
+export function chooseModelStorage(): Promise<string | null> {
+  return invokeAsr<string | null>('asr_choose_model_storage', undefined, 'The model folder could not be changed.');
+}
+export interface MirrorLatency { mirror: AsrDownloadMirror; latencyMs: number | null; bytesPerSecond: number | null; sampleBytes: number; message: string; }
+export function probeMirrors(): Promise<MirrorLatency[]> {
+  return invokeAsr<MirrorLatency[]>('asr_probe_mirrors', undefined, 'Mirror latency could not be measured.');
 }
 
 export interface ProviderTestResult {

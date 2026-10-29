@@ -54,13 +54,6 @@ export function SummaryPage() {
 
   useEffect(() => {
     let alive = true;
-    const snapshot = readMeetingView(meetingId);
-    setLoading(!snapshot);
-    setPageError('');
-    if (!snapshot) {
-      setMeeting(null);
-      setTranscript([]);
-    }
     void services.meetings.get(meetingId).then((result) => {
       if (alive) { if (!result) reportMissing(); setMeeting(result); setLoading(false); }
     }).catch((error) => { if (alive) { setPageError(describeError(error, t('summaryUnavailableDetail'))); setLoading(false); } });

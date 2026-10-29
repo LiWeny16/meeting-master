@@ -6,9 +6,9 @@ This note records what the current UI promises and how it is wired. It is a smal
 
 - The native window title bar owns the first full-width grid row. Sidebar, workspace, and assistant share the row beneath it, so opening or collapsing the assistant cannot move the title bar or its controls.
 - The workspace route owns its scrolling. The sidebar and chat thread scroll independently. At narrower widths the assistant opens as an overlay and the title bar stays visible.
-- Each meeting has one conversation thread and saved history keyed by that route's meeting ID. General pages use a separate global thread. Changing the page never changes a meeting's history key.
-- The composer accepts Enter to send and Shift+Enter for a newline. Its add menu shows the current meeting and selected text only; it does not advertise disconnected knowledge or attachment features.
-- The empty thread offers four starts: catch up, draft an answer, suggest a question, and identify decisions and actions. Model selection lives in the assistant panel's header row, beside the conversation title, so the composer stays a single text field plus a send button. The row under the header states which meeting the conversation is attached to. Send, stop, errors, and tool-permission decisions remain visible in the thread.
+- The assistant uses one visible conversation scope across pages. A fresh launch starts an empty conversation; prior conversations are available from the history menu. Stored model messages are scoped to the meeting context that produced them, so navigating does not silently replay another meeting's context.
+- The composer accepts Enter to send and Shift+Enter for a newline. It accepts supported image and text attachments and explicitly attached knowledge passages, transcript excerpts, and identities. Attached context remains visible and removable.
+- The empty thread offers meeting-specific starts when a meeting is open and general suggestions elsewhere. Model selection is in the composer. The context row identifies the current page and meeting, and the context menu explains which page state is sent. Send, stop, errors, and tool-permission decisions remain visible in the thread.
 - Only finalized transcript segments are available to assistant tools. Partial text is useful for the live view but does not enter persisted meeting history.
 
 ## Provider boundaries
@@ -23,6 +23,6 @@ Summary generation is explicit: the completed-meeting page opens the matching co
 
 ## Unsupported paths
 
-The app does not run downloaded local ASR weights for inference, stream meeting audio to the other configured ASR providers, index imported knowledge files, persist meeting identities, or diarize individual speakers. A successful provider test is not evidence of live transcription support. These items should remain described as unavailable until a complete native path exists.
+The app does not run downloaded local ASR weights for inference, stream meeting audio to the other configured ASR providers, or diarize individual speakers. It does not include its own document index: RAGFlow handles upload and indexing, while Open WebUI and AnythingLLM are currently search integrations. MCP tools are inspected and called manually with confirmation rather than automatically exposed to the assistant. A successful provider test is not evidence of live transcription support. These items should remain described as unavailable until a complete native path exists.
 
 Provider marks are imported as local SVG assets: LobeHub's static icon package is MIT licensed (https://github.com/lobehub/lobe-icons); the vendored Deepgram mark comes from Simple Icons, which publishes its icons under CC0 (https://github.com/simple-icons/simple-icons). No provider logos load from a CDN.

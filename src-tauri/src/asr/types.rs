@@ -165,6 +165,7 @@ pub struct AsrLocalSnapshot {
     pub models: Vec<LocalModelInfo>,
     pub active: AsrSelection,
     pub storage_dir: String,
+    pub configured_storage_dir: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

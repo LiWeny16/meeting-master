@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 const runtimeDir = resolve(dirname(fileURLToPath(import.meta.url)), '../agent-runtime');
 
-async function runHost({ effort, providerId = 'deepseek', toolRound = false, history = [], visibleHistory = [], meetingId = 'mock' }) {
+async function runHost({ effort, providerId = 'deepseek', toolRound = false, history = [], visibleHistory = [], meetingId = 'mock', attachments = [] }) {
   const requests = [];
   const events = [];
   let error = '';
@@ -69,7 +69,7 @@ async function runHost({ effort, providerId = 'deepseek', toolRound = false, his
       apiKey: 'fake', noAuth: false, thinkingEffort: effort,
       model: { id: 'deepseek-flash', name: 'Mock', contextWindow: 1_000_000, maxTokens: 4096 },
     },
-    text: 'Summarize the meeting.', displayText: 'Summarize the meeting.', history, visibleHistory,
+    text: 'Summarize the meeting.', displayText: 'Summarize the meeting.', history, visibleHistory, attachments,
   });
   const [code] = await once(child, 'close');
   clearTimeout(timer);
@@ -118,6 +118,16 @@ test('Other OpenAI-compatible providers keep their existing request fields', { t
 test('General chat does not send unavailable meeting tools', { timeout: 20_000 }, async () => {
   const { requests } = await runHost({ effort: 'off', meetingId: null });
   assert.ok(!requests[0].tools || requests[0].tools.length === 0);
+});
+
+test('sends text files and images to a compatible model', { timeout: 20_000 }, async () => {
+  const { requests } = await runHost({ providerId: 'other-provider', meetingId: null, attachments: [
+    { kind: 'text', name: 'notes.txt', mimeType: 'text/plain', data: '<attachment name="notes.txt">meeting notes</attachment>' },
+    { kind: 'image', name: 'sample.png', mimeType: 'image/png', data: 'iVBORw0KGgo=' },
+  ] });
+  const user = requests[0].messages.find((message) => message.role === 'user');
+  assert.ok(user.content.some((part) => part.type === 'text' && part.text.includes('meeting notes')));
+  assert.ok(user.content.some((part) => part.type === 'image_url' && part.image_url.url === 'data:image/png;base64,iVBORw0KGgo='));
 });
 
 test('Visible history appends a turn when scoped model history has a different length', { timeout: 20_000 }, async () => {

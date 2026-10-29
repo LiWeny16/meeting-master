@@ -28,6 +28,7 @@ pub(crate) struct StoredProvider {
 pub(crate) struct Settings {
     pub providers: HashMap<String, StoredProvider>,
     pub active: AsrSelection,
+    pub model_storage_dir: Option<String>,
 }
 
 /// Cheap-to-share, thread-safe ASR management state.
@@ -49,7 +50,7 @@ impl AsrState {
             format!("Could not resolve the application data directory: {error}")
         })?;
         let asr_dir = app_data_dir.join("asr");
-        let models_dir = asr_dir.join("models");
+        let default_models_dir = asr_dir.join("models");
 
         fs::create_dir_all(&asr_dir).map_err(|error| {
             format!(
@@ -57,13 +58,6 @@ impl AsrState {
                 asr_dir.display()
             )
         })?;
-        fs::create_dir_all(&models_dir).map_err(|error| {
-            format!(
-                "Could not create ASR models directory {}: {error}",
-                models_dir.display()
-            )
-        })?;
-
         let settings_path = asr_dir.join("settings.json");
         let settings = match load_settings(&settings_path) {
             Ok(settings) => settings,
@@ -83,6 +77,18 @@ impl AsrState {
                 Settings::default()
             }
         };
+        let requested = settings.model_storage_dir.as_deref().map(PathBuf::from);
+        let models_dir = requested
+            .as_ref()
+            .filter(|path| path.is_dir())
+            .cloned()
+            .unwrap_or(default_models_dir);
+        fs::create_dir_all(&models_dir).map_err(|error| {
+            format!(
+                "Could not create ASR models directory {}: {error}",
+                models_dir.display()
+            )
+        })?;
 
         // Probes use a bounded total timeout; downloads intentionally have no
         // total timeout because model archives can take a long time.
@@ -264,6 +270,7 @@ impl AsrState {
             models,
             active: settings.active,
             storage_dir: self.models_dir.to_string_lossy().into_owned(),
+            configured_storage_dir: settings.model_storage_dir,
         })
     }
 }

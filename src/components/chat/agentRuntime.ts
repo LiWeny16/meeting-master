@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useLocalRuntime } from '@assistant-ui/react';
+import { CompositeAttachmentAdapter, SimpleImageAttachmentAdapter, SimpleTextAttachmentAdapter, useLocalRuntime } from '@assistant-ui/react';
 import type { ChatModelAdapter, ChatModelRunResult } from '@assistant-ui/react';
 import type {
   AssistantRuntime,
@@ -8,7 +8,7 @@ import type {
   ThreadMessage,
   ToolCallMessagePart,
 } from '@assistant-ui/core';
-import type { AgentEvent, AppServices } from '../../domain/contracts';
+import type { AgentAttachment, AgentEvent, AppServices } from '../../domain/contracts';
 
 export const PERMISSION_PART_NAME = 'permission_request';
 export const CONTEXT_STATUS_PART_NAME = 'context_status';
@@ -68,6 +68,35 @@ function readUserText(messages: readonly ThreadMessage[]): string {
   return '';
 }
 
+function readAttachments(messages: readonly ThreadMessage[]): AgentAttachment[] {
+  const message = [...messages].reverse().find((item) => item.role === 'user');
+  if (!message || message.role !== 'user') return [];
+  return message.attachments.flatMap((attachment) => attachment.content.flatMap((part): AgentAttachment[] => {
+    if (part.type === 'text') return [{ name: attachment.name, kind: 'text', mimeType: attachment.contentType ?? 'text/plain', data: part.text }];
+    if (part.type === 'image') {
+      const match = /^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/i.exec(part.image);
+      if (!match) throw new Error('Unsupported image format. Select a PNG, JPEG or WebP image.');
+      return [{ name: attachment.name, kind: 'image', mimeType: match[1].toLowerCase(), data: match[2] }];
+    }
+    throw new Error('This attachment type is not supported.');
+  }));
+}
+
+class LimitedImageAdapter extends SimpleImageAttachmentAdapter {
+  accept = 'image/png,image/jpeg,image/webp';
+  async add(state: { file: File }) {
+    if (state.file.size > 4 * 1024 * 1024) throw new Error('Images must be 4 MB or smaller.');
+    return super.add(state);
+  }
+}
+class LimitedTextAdapter extends SimpleTextAttachmentAdapter {
+  accept = 'text/plain,text/html,text/markdown,text/csv,text/xml,text/json,application/json,text/css,.txt,.md,.csv,.json,.xml,.css,.html';
+  async add(state: { file: File }) {
+    if (state.file.size > 256 * 1024) throw new Error('Text files must be 256 KB or smaller.');
+    return super.add(state);
+  }
+}
+
 function asArguments(value: unknown): ToolCallMessagePart['args'] {
   if (value && typeof value === 'object' && !Array.isArray(value)) {
     return value as ToolCallMessagePart['args'];
@@ -125,7 +154,7 @@ export function useAgentRuntime(services: AppServices): AssistantRuntime {
 
       let failure: Error | null = null;
       const run = services.agent
-        .send({ text: readUserText(messages) }, (event) => queue.push(event), abortSignal)
+        .send({ text: readUserText(messages), attachments: readAttachments(messages) }, (event) => queue.push(event), abortSignal)
         .catch((error) => { failure = error instanceof Error ? error : new Error(String(error)); })
         .finally(() => queue.close());
 
@@ -203,5 +232,6 @@ export function useAgentRuntime(services: AppServices): AssistantRuntime {
     },
   }), [services]);
 
-  return useLocalRuntime(adapter);
+  const attachments = useMemo(() => new CompositeAttachmentAdapter([new LimitedImageAdapter(), new LimitedTextAdapter()]), []);
+  return useLocalRuntime(adapter, { adapters: { attachments } });
 }

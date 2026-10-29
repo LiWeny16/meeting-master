@@ -687,3 +687,12 @@
 .live-audio-meter { width: 54px; height: 5px; overflow: hidden; border-radius: var(--r-full); background: var(--c-surface-4); }
 .live-audio-meter > span { display: block; height: 100%; border-radius: inherit; background: var(--brand); }
 .live-audio-level-label { min-width: 3.5em; color: var(--c-ink-4); }
+.meeting-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 14px 0;
+  color: var(--c-ink-2);
+  font-size: 0.875rem;
+}

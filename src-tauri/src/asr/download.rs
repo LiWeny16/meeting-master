@@ -268,7 +268,7 @@ async fn write_manifest(model_dir: &Path, model: &CatalogModel) -> Result<(), St
         })
 }
 
-fn mirror_base(mirror: &str) -> Result<&'static str, String> {
+pub(crate) fn mirror_base(mirror: &str) -> Result<&'static str, String> {
     match mirror {
         "hf-mirror" | "" => Ok("https://hf-mirror.com"),
         "huggingface" => Ok("https://huggingface.co"),

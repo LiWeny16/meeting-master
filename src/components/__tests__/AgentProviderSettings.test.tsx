@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { AppServicesProvider } from '../../app/AppServicesContext';
 import { ThemePreferencesProvider } from '../../app/ThemePreferencesContext';
-import type { AgentProviderInfo, AgentProviderSaveInput, AgentStatus, AppServices } from '../../domain/contracts';
+import type { AgentProviderInfo, AgentStatus, AppServices } from '../../domain/contracts';
 import { createUnavailableServices } from '../../services/UnavailableServices';
 import { AgentProviderSettings } from '../settings/AgentProviderSettings';
 
@@ -28,7 +28,7 @@ function renderSettings(agent: Partial<AppServices['agent']>) {
 
 describe('AI provider settings', () => {
   it('prepares a DeepSeek API-key provider with a usable model', async () => {
-    const saveProvider = vi.fn(async (_input: AgentProviderSaveInput) => deepseek);
+    const saveProvider = vi.fn(async () => deepseek);
     renderSettings({ getSettings: async () => ({ activeProvider: 'local', activeModel: 'local-model', providers: [local] }), saveProvider });
     fireEvent.click(await screen.findByRole('button', { name: 'Add DeepSeek' }));
     const dialog = screen.getByRole('dialog');
